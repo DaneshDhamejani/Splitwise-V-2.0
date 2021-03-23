@@ -1,14 +1,56 @@
 import React, {Component} from "react";
 import '../Navbar/Navbar_style.css'
 import logo from '../assets/splitwise_logo.png';
-
+import {Link} from "react-router-dom";
+import {Redirect} from 'react-router';
+var redirectVar = null;
 class NavbarClass extends React.Component {
     constructor(props) {
         super(props);
     }
+    handleLogout = () => {
+        localStorage.removeItem('user');
+        // redirectVar = <Redirect to= "/login"/>
+
+    };
     render() {
+
+        
+        // Displaying the logout button if the user is logged in
+if(localStorage.getItem("user"))
+{
+    var userLoggedIn = (<ul className="nav navbar-nav navbar-right">
+    <li>
+      <Link to="/login" onClick={this.handleLogout}>
+      <a className="btn btn-outline signup m-sm-0" href="/login">Logout</a>
+      </Link>
+    </li>
+  </ul>
+    )
+}
+else{
+    var userLoggedIn=(
+    <ul className="nav navbar-nav navbar-right">
+        <li>
+        <div className="d-flex flex-row-reverse" >
+                        <div className="ml-5"></div>
+                        <div className="ml-5"></div>
+                        <div className="p-2">
+                            <a className="btn btn-outline signup m-sm-0" href="/signup">Sign up</a>
+                        </div>
+                        <div className="p-2">
+                            <a className="nav-link active login" href="/login">Log in
+                                <span className="sr-only"></span>
+                            </a>
+                        </div>
+                    </div>
+            </li>
+    </ul>
+    )
+}
         return (
             <div>
+                {redirectVar}
                 <nav className="navbar navbar-light bg-light justify-content-between">
                     <a className="navbar-brand" href="/home">
                         <img src={logo}
@@ -17,18 +59,7 @@ class NavbarClass extends React.Component {
                             class="d-inline-block align-top"
                             alt="Splitwise"></img>
                     </a>
-                    <div class="d-flex flex-row-reverse">
-                        <div class="ml-5"></div>
-                        <div class="ml-5"></div>
-                        <div class="p-2">
-                            <a class="btn btn-outline signup m-sm-0" href="/signup">Sign up</a>
-                        </div>
-                        <div class="p-2">
-                            <a class="nav-link active login" href="/login">Log in
-                                <span class="sr-only"></span>
-                            </a>
-                        </div>
-                    </div>
+                    {userLoggedIn}
                 </nav>
             </div>
         );

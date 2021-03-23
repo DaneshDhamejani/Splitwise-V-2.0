@@ -8,8 +8,9 @@ class Landing extends React.Component {
     super(props);
   }
   render() {
+   
     return (
-      <div>
+      <div data-testid="Landing">
         <a href="/signup">
           <img
             src={bg_image}
