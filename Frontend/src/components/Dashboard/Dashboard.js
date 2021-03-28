@@ -24,18 +24,16 @@ class Dashboard extends Component {
             totaliamowed: 0,
             username: "",
             totalbalance: 0,
-            youowe:[],
-            youareowed:[],
             alluserstats:[],
             userlistoptions:[],
             nametosettleup:"",
             emailtosettle:"",
             error:"",
             alloverallstats:[],
-            Iowe:[],
-            Iowed:[]
-
-
+            owearray:[],
+            owedarray:[],
+            userobjectsettle:[],
+            useramount:0
         }
         this.handleModalOpen = this.handleModalOpen.bind(this);
         this.handleModalClose = this.handleModalClose.bind(this);
@@ -53,9 +51,13 @@ class Dashboard extends Component {
         })
       }
     handleSettleUpEmail = (e) => {
+        let user=JSON.parse(e.target.value)
         this.setState({
-            emailtosettleup : e.target.value
+            emailtosettle : user.email,
+            useramount : user.amount
         })
+        
+        
     }
 
     submitSettleUp = (e) => {
@@ -64,9 +66,11 @@ class Dashboard extends Component {
         var data = {
             //nametosettle:this.state.nametosettleup,
             useremail,
-            emailtosettleup:this.state.emailtosettleup
+            settlemail:this.state.emailtosettle,
+            useramount:this.state.useramount
 
             }
+            
         
         // axios.post("http://localhost:3001/emailtosettle",data)
         //     .then((response) => {
@@ -117,106 +121,163 @@ class Dashboard extends Component {
             console.log("Name for dashboard", this.state.username)
 
         })
-        axios.post(`${backendServer}/getalluserstats11`, data).then((response) => {
-            console.log("Got over all stats")
-            this.setState({alloverallstats: response.data});
-            console.log("Printing updated state",this.state.alloverallstats)
-            var owedarray=[]
-            var owearray=[]
-            var temparray=[]
-            temparray=this.state.alloverallstats
-            console.log(temparray)
-            console.log(this.state.alloverallstats[0])
-            for(var i=0;i<temparray.length;i++)
-            {
-                if(temparray[i].receiver!=null)
-                {
-                    owedarray.push({ "name" :temparray[i].receiver,"amount" : temparray[i].he_owes_me})
-                }
-                else if(temparray[i].sender!=null)
-                {
-                    owearray.push({ "name" :temparray[i].sender,"amount" : temparray[i].he_has_paid})
-                }
+//         axios.post(`${backendServer}/getalluserstats11`, data).then((response) => {
+//             console.log("Got over all stats")
+//             this.setState({alloverallstats: response.data});
+//             console.log("Printing updated state",this.state.alloverallstats)
+//             var owedarray=[]
+//             var owearray=[]
+//             var temparray=[]
+//             temparray=this.state.alloverallstats
+//             console.log(temparray)
+//             console.log(this.state.alloverallstats[0])
+//             for(var i=0;i<temparray.length;i++)
+//             {
+//                 if(temparray[i].receiver!=null)
+//                 {
+//                     owedarray.push({ "name" :temparray[i].receiver,"amount" : temparray[i].he_owes_me})
+//                 }
+//                 else if(temparray[i].sender!=null)
+//                 {
+//                     owearray.push({ "name" :temparray[i].sender,"amount" : temparray[i].he_has_paid})
+//                 }
 
-            }
+//             }
 
     
-      let TransactionMap = new Map();
-      for (let i = 0; i < owearray.length; i++) {
-        TransactionMap.set(owearray[i].name,owearray[i].amount);
-      }
-      console.log(TransactionMap);
+//       let TransactionMap = new Map();
+//       for (let i = 0; i < owearray.length; i++) {
+//         TransactionMap.set(owearray[i].name,owearray[i].amount);
+//       }
+//       console.log(TransactionMap);
 
-      for(let i=0;i<owedarray.length;i++){
-        console.log("kkkkkk");
-        if(TransactionMap.has(owedarray[i].name)){
-          console.log("hello");
-          TransactionMap.set(owedarray[i].name,TransactionMap.get(owedarray[i].name)-owedarray[i].amount);
-        }else{
-          TransactionMap.set(owedarray[i].name,0-owedarray[i].amount);
-        }
-        }
+//       for(let i=0;i<owedarray.length;i++){
+        
+//         if(TransactionMap.has(owedarray[i].name)){
+          
+//           TransactionMap.set(owedarray[i].name,TransactionMap.get(owedarray[i].name)-owedarray[i].amount);
+//         }else{
+//           TransactionMap.set(owedarray[i].name,0-owedarray[i].amount);
+//         }
+//         }
         
       
       
-      console.log(TransactionMap);
+//       console.log(TransactionMap);
 
-      const oweArray=[];
-      const areOwedArray=[];
+//       const oweArray=[];
+//       const areOwedArray=[];
 
-      TransactionMap.forEach((value, key) => {
-        console.log(value);
-        console.log(key);
-        if(value>0){
+//       TransactionMap.forEach((value, key) => {
+//         console.log(value);
+//         console.log(key);
+//         if(value>0){
           
-          oweArray.push({name:key,amount:value});
-        }else if(value<0){
-          areOwedArray.push({name: key,amount:(0-value)});
-        }
-    })
-    this.setState({
-        Iowe : oweArray,
-        Iowed: areOwedArray
-    })
+//           oweArray.push({name:key,amount:value});
+//         }else if(value<0){
+//           areOwedArray.push({name: key,amount:(0-value)});
+//         }
+//     })
+//     this.setState({
+//         Iowe : oweArray,
+//         Iowed: areOwedArray
+//     })
 
-    var totalowe=0;
-    console.log("State of you owe is here",this.state.Iowe)
-    for(var i=0;i<this.state.Iowe.length;i++)
-    {
-        totalowe=totalowe+Math.abs(this.state.Iowe[i].amount)
-    }
-    console.log("Total amount I owe",totalowe)
+//     var totalowe=0;
+//     console.log("State of you owe is here",this.state.Iowe)
+//     for(var i=0;i<this.state.Iowe.length;i++)
+//     {
+//         totalowe=totalowe+Math.abs(this.state.Iowe[i].amount)
+//     }
+//     console.log("Total amount I owe",totalowe)
    
     
-    var totalowed=0;
-    console.log("State of what I am owed is here",this.state.Iowed)
-    for(var i=0;i<this.state.Iowed.length;i++)
-    {
-        totalowed=totalowed+this.state.Iowed[i].amount
-    }
-    console.log("Total amount I am owed",totalowed)
+//     var totalowed=0;
+//     console.log("State of what I am owed is here",this.state.Iowed)
+//     for(var i=0;i<this.state.Iowed.length;i++)
+//     {
+//         totalowed=totalowed+this.state.Iowed[i].amount
+//     }
+//     console.log("Total amount I am owed",totalowed)
 
-    var total_balance=totalowed-totalowe
-    this.setState({
-        totaliowe: totalowe,
-        totaliamowed:totalowed,
-        totalbalance:total_balance
-    });
-
-
-console.log("Final state Whom I owe Printing I owe:",this.state.Iowe);
-console.log("Final state Who owe me:",this.state.Iowed);
+//     var total_balance=totalowed-totalowe
+//     this.setState({
+//         totaliowe: totalowe,
+//         totaliamowed:totalowed,
+//         totalbalance:total_balance
+//     });
 
 
+// console.log("Final state Whom I owe Printing I owe:",this.state.Iowe);
+// console.log("Final state Who owe me:",this.state.Iowed);
 
-             })
-      
+
+
+            //  })
+             
+             axios.post(`${backendServer}/getalluserstats`, data).then((response) => {
+                var tempowedarray=[]
+                var tempowearray=[]
+                console.log("Got over all stats")
+                this.setState({alloverallstats: response.data});
+                console.log("Printing all stats at the frontend",this.state.alloverallstats)
+                for(var i=0;i<this.state.alloverallstats.length;i++)
+                {
+                    console.log(this.state.alloverallstats[i].overallamount)
+                    if(this.state.alloverallstats[i].overallamount>0)
+                    {
+                        tempowedarray.push({ "email" :this.state.alloverallstats[i].emailee,"amount" : this.state.alloverallstats[i].overallamount})
+                    }
+                    else if(this.state.alloverallstats[i].overallamount<0)
+                    {
+                        tempowearray.push({ "email" :this.state.alloverallstats[i].emailee,"amount" : this.state.alloverallstats[i].overallamount})  
+               
+                    }
+                }
+                console.log("Tempowearray",tempowearray)
+                console.log("Tempowedarray",tempowedarray)
+
+                var totalowe=0
+                var totalowed=0
+                var total_balance=0
+                for(var i=0;i<tempowearray.length;i++)
+                {
+                    totalowe=totalowe+Math.abs(tempowearray[i].amount)
+                }
+                for(var i=0;i<tempowedarray.length;i++)
+                {
+                    totalowed=totalowed+tempowedarray[i].amount
+                }
+
+                var total_balance=totalowed-totalowe
+                console.log("Total balance",total_balance)
+                this.setState({
+                            totaliowe: totalowe,
+                            totaliamowed:totalowed,
+                            owearray: tempowearray,
+                            owedarray:tempowedarray,
+                            totalbalance:total_balance
+                        });
+                    
+
+                console.log("Mujhe itna paisa dena hai",tempowearray)
+                console.log("Mujhe itna paisa lena hai",tempowedarray)
+                console.log("State of owe array",this.state.owearray)
+                console.log("State of owed array",this.state.owedarray)
+                
+
+
        
         
     
-}
+})
+     }
 
     render() {
+         console.log("User object settle:",this.state.emailtosettle)
+         console.log("Email to settle danesh:",this.state.emailtosettle)
+         console.log("User amount danesh:",this.state.useramount)
+         console.log("Overall user object:",this.state.userobjectsettle)
         
         if (!localStorage.getItem('user')) 
             redirectVar = <Redirect to="/login"/>
@@ -246,9 +307,9 @@ console.log("Final state Who owe me:",this.state.Iowed);
                   <option selected disabled hidden>
                     Select one person
                   </option>
-                  {this.state.Iowe.map((user) => (
-                    <option value={user.name}>
-                      {user.name} &nbsp;: {user.amount}
+                  {this.state.owearray.map((user) => (
+                    <option value={JSON.stringify(user)}>
+                      {user.email}: &nbsp; {user.amount}
                     </option>
                   ))}
                 </Form.Control>
@@ -279,11 +340,11 @@ console.log("Final state Who owe me:",this.state.Iowed);
                     </div>
                     <div className="col-md-3">
                         <b>You owe</b>
-                        <div><b>$ </b>{this.state.totaliowe}
+                        <div><b>$ </b>{Math.abs(this.state.totaliowe)}
                         </div><br></br>
                         <div>
-                        {this.state.Iowe.map((user) => (
-                <ul><li>You owe <b>{user.name}</b> <b>$</b>{Math.abs(user.amount)}</li></ul>
+                        {this.state.owearray.map((user) => (
+                <ul><li>You owe <b>{user.email}</b> <b>$</b>{Math.abs(user.amount)}</li></ul>
                 ))}
                         </div>
                     </div>
@@ -291,8 +352,8 @@ console.log("Final state Who owe me:",this.state.Iowed);
                         <b>You are owed</b>
                         <div><b>$ </b>{this.state.totaliamowed}</div><br></br>
                         <div>
-                        {this.state.Iowed.map((user) => (
-                <ul><li><b>{user.name}</b> owes you <b>$</b>{user.amount}</li></ul>
+                        {this.state.owedarray.map((user) => (
+                <ul><li><b>{user.email}</b> owes you <b>$</b>{user.amount}</li></ul>
                 ))}
                         </div>
                     </div>

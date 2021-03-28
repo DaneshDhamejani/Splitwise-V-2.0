@@ -11,9 +11,27 @@ var bcrypt = require('bcryptjs');
 const fs = require("fs");
 const util = require("util");
 const pipeline = util.promisify(require("stream").pipeline);
-app.use(express.static(__dirname + "/public"));
+// app.use(express.static(__dirname + "/public"));    Commented this for mongo
 const multer = require("multer");
 const upload = multer();
+
+const mongoose = require('mongoose');
+const uri = "mongodb+srv://danesh123:danesh123@splitwisecluster.qrygt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const passport = require('passport')
+const jwt = require('jsonwebtoken');
+const UserModel = require('./models/user');
+require('./auth/auth');
+const routes = require('./routes/routeindex');
+const secureRoute = require('./routes/secureroutes');
+app.use('/', routes);
+app.use('/user', passport.authenticate('jwt', { session: false }), secureRoute);
+
+
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.json({ error: err });
+  });
+  
 
 
 app.use(express.json());
@@ -21,27 +39,49 @@ app.use(express.json());
 app.use(cors({origin: "http://localhost:3000", credentials: true}));
 
 
-// app.use(express.bodyParser());
+var bodyParser = require('body-parser');
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 // use express session to maintain session data
 
-app.use(session({
-    secret: "splitwise",
-    resave: false, // Forces the session to be saved back to the session store, even if the session was never modified during the request
-    saveUninitialized: false, // Force to save uninitialized session to db. A session is uninitialized when it is new but not modified.
-    duration: 60 * 60 * 1000, // Overall duration of Session : 30 minutes : 1800 seconds
-    activeDuration: 5 * 60 * 1000
-}));
 
-// app.use(bodyParser.urlencoded({
-//     extended: true
+// Commented the below for mongo
+// app.use(session({
+//     secret: "splitwise",
+//     resave: false, // Forces the session to be saved back to the session store, even if the session was never modified during the request
+//     saveUninitialized: false, // Force to save uninitialized session to db. A session is uninitialized when it is new but not modified.
+//     duration: 60 * 60 * 1000, // Overall duration of Session : 30 minutes : 1800 seconds
+//     activeDuration: 5 * 60 * 1000
+// }));
+// Commented the above for mongo
 
 
-const con = mysql.createConnection
-({host: "splitwiselab1db.cuo9mbgyeo0i.us-east-2.rds.amazonaws.com", 
-user: "admin", 
-password: "danesh123", 
-database: "splitwise"});
+// mongoose.connect(uri, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+//   })
+//   .then(() => {
+//     console.log("MongoDB Connected…")
+//   })
+//   .catch(err => console.log(err))
+
+
+mongoose.connect(uri, { useMongoClient: true });
+mongoose.connection.on('error', error => console.log(error) );
+mongoose.Promise = global.Promise;
+
+
+
+
+
+
+
+// const con = mysql.createConnection
+// ({host: "splitwiselab1db.cuo9mbgyeo0i.us-east-2.rds.amazonaws.com", 
+// user: "admin", 
+// password: "danesh123", 
+// database: "splitwise"});
 
 
 // const con = mysql.createPool({
@@ -54,7 +94,8 @@ database: "splitwise"});
 //   });
 
 
-app.use(bodyParser.urlencoded({extended: true}));
+// app.use(bodyParser.urlencoded({extended: false}));
+// app.use(bodyParser.urlencoded({extended: true}));
 
 // con.connect(function (err) {
 //     console.log("Connected!");

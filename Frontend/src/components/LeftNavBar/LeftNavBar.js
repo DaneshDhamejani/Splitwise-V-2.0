@@ -37,7 +37,7 @@ class LeftNavBar extends Component {
                 <Nav.Link href="/addgroup">Add a new group</Nav.Link>
                 <Nav.Link href="/profile">Your Profile</Nav.Link>
                 <Nav.Link href={`/activity/${useremail}`} >Recent Activity</Nav.Link>
-                {/* <Nav.Link href={`/invitation/${useremail}`} >View Invitations</Nav.Link> */}
+                <Nav.Link href={`/invitation/${useremail}`} >View Invitations</Nav.Link>
                 {this.state.usergroups.map((user) => (
                 <Nav.Link className="user" href={`/groups/${user.group_name}`}>
                 {user.group_name}
