@@ -8,11 +8,12 @@ var cors = require("cors");
 var mysql = require('mysql');
 app.set("view engine", "ejs");
 var bcrypt = require('bcryptjs');
-const multer = require("multer");
 const fs = require("fs");
 const util = require("util");
 const pipeline = util.promisify(require("stream").pipeline);
 app.use(express.static(__dirname + "/public"));
+const multer = require("multer");
+const upload = multer();
 
 
 app.use(express.json());
@@ -130,7 +131,7 @@ app.post('/ologin', function (req, res) {
 
 app.get('/odashboard/:useremail', function (req, res) {
     console.log("Inside getgroups get")
-    con.query("SELECT group_name FROM user_group where user_email=?", [req.params.useremail], (err, result) => {
+    con.query("SELECT group_name FROM user_group where user_email=? AND invite_flag=1", [req.params.useremail], (err, result) => {
         if (err) {
             res.writeHead(400, {'Content-Type': 'text/plain'})
             res.end("Could Not Get Connection Object");
@@ -175,8 +176,8 @@ app.post('/creategroup/:useremail', function (req, res) {
 
     for (let i = 0; i < result.length; i++) {
         console.log("Inside loop")
-        con.query("INSERT INTO user_group (`user_email`,`group_name`) VALUES (?,?)", [
-            result[i], groupname
+        con.query("INSERT INTO user_group (`user_email`,`group_name`,`invite_flag`) VALUES (?,?,?)", [
+            result[i], groupname,0
         ], (err, result) => {
             if (err) 
                 console.log(err);
@@ -434,12 +435,12 @@ app.post('/getalluserdues', function (req, res) {
 
 
 
-// In progress
+// This is my perfect
 app.post('/getalluserstats', function (req, res) {
     var myemail = req.body.useremail
     console.log("My email:", myemail)
     console.log("Inside fetching all money I have to pay")
-    con.query("select user_table.name,ABC.overallamount from (select emailee,he_owes_me- he_has_paid as overallamount from((select A.receiver as emailee,IFNULL(A.he_owes_me,0) as he_owes_me,B.sender,IFNULL(B.he_has_paid,0) as he_has_paid FROM (select receiver,sum(final_amount) as he_owes_me from splitwise.transaction where sender=? group by receiver)A LEFT JOIN (select sender,sum(final_amount) as he_has_paid from splitwise.transaction where receiver=? group by sender)B on A.receiver=B.sender) UNION ALL (select A.receiver,IFNULL(A.he_owes_me,0),B.sender,IFNULL(B.he_has_paid,0) FROM (select receiver,sum(final_amount) as he_owes_me from splitwise.transaction where sender=? group by receiver)A RIGHT JOIN (select sender,sum(final_amount) as he_has_paid from splitwise.transaction  where receiver=? group by sender)B on A.receiver=B.sender where B.sender is null))AA group by emailee)ABC inner join user_table on ABC.emailee=user_table.email", [
+    con.query("select emailee,he_owes_me- he_has_paid as overallamount from((select A.receiver as emailee,IFNULL(A.he_owes_me,0) as he_owes_me,B.sender,IFNULL(B.he_has_paid,0) as he_has_paid FROM (select receiver,sum(final_amount) as he_owes_me from splitwise.transaction where sender=? group by receiver)A LEFT JOIN (select sender,sum(final_amount) as he_has_paid from splitwise.transaction where receiver=? group by sender)B on A.receiver=B.sender) UNION ALL (select A.receiver,IFNULL(A.he_owes_me,0),B.sender,IFNULL(B.he_has_paid,0) FROM (select receiver,sum(final_amount) as he_owes_me from splitwise.transaction where sender=? group by receiver)A RIGHT JOIN (select sender,sum(final_amount) as he_has_paid from splitwise.transaction  where receiver=? group by sender)B on A.receiver=B.sender where B.sender is null))AA group by emailee", [
         myemail, myemail, myemail, myemail
     ], (err, result) => {
         if (err) {
@@ -454,23 +455,23 @@ app.post('/getalluserstats', function (req, res) {
 
 })
 
-app.post('/getalluserstats11', function (req, res) {
-    var myemail = req.body.useremail
-    console.log("My email:", myemail)
-    console.log("Inside fetching all money I have to pay")
-    con.query("select * from (select receiver,sum(final_amount) as he_owes_me from splitwise.transaction where sender=? group by receiver)A left join (select sender,sum(final_amount) as he_has_paid from splitwise.transaction  where receiver=? group by sender)B on A.receiver=B.sender UNION ALL select * from (select receiver,sum(final_amount) as he_owes_me from splitwise.transaction where sender=? group by receiver)A right join (select sender,sum(final_amount) as he_has_paid from splitwise.transaction  where receiver=? group by sender)B on A.receiver=B.sender where A.receiver is null", [
-        myemail, myemail, myemail, myemail], (err, result) => {
-        if (err) {
-            res.writeHead(400, {'Content-Type': 'text/plain'})
-            res.end("Could Not Get Connection Object");
-        } else {
-            res.writeHead(200, {'Content-Type': 'application/json'})
-            console.log("Printing all user stats together:", JSON.stringify(result))
-            res.end(JSON.stringify(result));
-        }
-    })
+// app.post('/getalluserstats11', function (req, res) {
+//     var myemail = req.body.useremail
+//     console.log("My email:", myemail)
+//     console.log("Inside fetching all money I have to pay")
+//     con.query("select * from (select receiver,sum(final_amount) as he_owes_me from splitwise.transaction where sender=? group by receiver)A left join (select sender,sum(final_amount) as he_has_paid from splitwise.transaction  where receiver=? group by sender)B on A.receiver=B.sender UNION ALL select * from (select receiver,sum(final_amount) as he_owes_me from splitwise.transaction where sender=? group by receiver)A right join (select sender,sum(final_amount) as he_has_paid from splitwise.transaction  where receiver=? group by sender)B on A.receiver=B.sender where A.receiver is null", [
+//         myemail, myemail, myemail, myemail], (err, result) => {
+//         if (err) {
+//             res.writeHead(400, {'Content-Type': 'text/plain'})
+//             res.end("Could Not Get Connection Object");
+//         } else {
+//             res.writeHead(200, {'Content-Type': 'application/json'})
+//             console.log("Printing all user stats together:", JSON.stringify(result))
+//             res.end(JSON.stringify(result));
+//         }
+//     })
 
-})
+// })
 
 
 
@@ -494,16 +495,18 @@ app.post('/emailtosettle', function (req, res) {
 })
 
 
-app.post('/settleup',function (req, res) {
+ app.post('/settleup',function (req, res) {
     var useremail=req.body.useremail
-    var settlemail=req.body.emailtosettleup
+    var settlemail=req.body.settlemail
+    var settleamount=Math.abs(req.body.useramount)
     //console.log("Inside settle up at backend:",nametosettle)
     console.log("Inside settle up main")
     console.log("Got my email at the backend:",useremail)
     console.log("Got email to settle with at the backend:",settlemail)
+    console.log("Settle up amount",settleamount)
     
     
-    con.query("UPDATE transaction SET final_amount = 0 WHERE sender=? AND receiver=?", [settlemail,useremail], (err, result) => {
+    con.query("INSERT INTO transaction (`sender`,`receiver`,`final_amount`) VALUES (?,?,?)", [useremail,settlemail,settleamount], (err, result) => {
         if (err) {
             res.writeHead(400, {'Content-Type': 'text/plain'})
             res.end("Could Not Get Connection Object");
@@ -515,6 +518,8 @@ app.post('/settleup',function (req, res) {
     })
 
  })
+
+
 
  app.post('/profile',function (req, res) {
     console.log("Inside profile page");
@@ -550,35 +555,70 @@ app.post('/settleup',function (req, res) {
 
  })
 
-//  app.post('/profilepic/:useremail',upload.single("file"),async function (req, res) {
-//     console.log("Inside profile pic page");
-//     useremail=req.body.email
-//     console.log("Got useremail",useremail)
-//     const {
-//         file,
-//         body: { name },
-//       } = req;
+// Get all groups in which the user is a part of with invite flag=0, that is invited but not accepted
+ app.post('/getallusergroups', function (req, res) {
+    useremail=req.body.useremail
+    console.log("Getting user email at backend in getallusergroups:",useremail)
+    console.log("Inside get all groups for Invite")
+    con.query("SELECT group_name from user_group WHERE invite_flag=0 and user_email=?", [useremail], (err, result) => {
+        if (err) {
+            res.writeHead(400, {'Content-Type': 'text/plain'})
+            res.end("Could Not Get Connection Object");
+        } else {
+            res.writeHead(200, {'Content-Type': 'application/json'})
+            // console.log(JSON.stringify(result))
+            res.end(JSON.stringify(result));
+        }
+    })
+})
+
+app.post('/acceptinvite', function (req, res) {
+    useremail=req.body.useremail
+    selectedgroupname=req.body.selectedgroupname
+    console.log("Displaying selected group name inside backend",selectedgroupname)
+    console.log("Inside get all groups for Invite")
+    con.query("UPDATE user_group SET invite_flag = 1 where group_name= ? and user_email = ?", [selectedgroupname,useremail], (err, result) => {
+        if (err) {
+            res.writeHead(400, {'Content-Type': 'text/plain'})
+            res.end("Could Not Get Connection Object");
+        } else {
+            res.writeHead(200, {'Content-Type': 'application/json'})
+            // console.log(JSON.stringify(result))
+            res.end(JSON.stringify(result));
+        }
+    })
+})
+
+
+ app.post('/uploadprofilepic/:useremail',upload.single("file"),async function (req, res) {
+    console.log("Inside profile pic page");
+    useremail=req.params.useremail
+    console.log("Got useremail inside profile pic",useremail)
+    const {
+        file,
+        body: {name},
+      } = req;
     
-//       Math.floor(Math.random * 1000);
-//       const fileName =
-//         Math.floor(Math.random(100000) * 100000) + file.detectedFileExtension;
-//       await pipeline(
-//         file.stream,
-//         fs.createWriteStream(`${__dirname}/public/${fileName}`)
-//       );
-//       db.query(
-//         "update user_table set profile_pic=? where email=?",
-//         [file, useremail],
-//         (err, result) => {
-//           if (err != null || err != undefined) {
-//             res.status(400).json({ error: "failed to upload image" });
-//           } else {
-//             res.status(200).json({ message: "success" });
-//           }
-//         }
-//       );
-//       // res.status(200).json({ message: "uploaded file" });
-//     });
+      Math.floor(Math.random * 1000);
+      const fileName =
+        Math.floor(Math.random(100000) * 100000) + file.detectedFileExtension;
+      await pipeline(
+        file.stream,
+        fs.createWriteStream(`${__dirname}/public/${fileName}`)
+      );
+      con.query(
+        "UPDATE user_table set profile_pic=? where email=?",
+        [file, useremail],
+        (err, result) => {
+          if (err != null || err != undefined) {
+            res.status(400).json({ error: "failed to upload image" });
+          } else {
+            res.status(200).json({ message: "success" });
+          }
+        }
+      );
+      // res.status(200).json({ message: "uploaded file" });
+    });
  
 
 app.listen(3001);
