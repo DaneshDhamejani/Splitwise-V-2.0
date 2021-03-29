@@ -16,9 +16,7 @@ export default class Profile extends Component {
         this.state = {
             useremail:useremail,
             username:"",
-            pic:"http://localhost:3001/untitled-3.jpg",
-            selectedFile:null,
-            profileImg:'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
+            profileImg: ''
         }
         
     }
@@ -76,19 +74,16 @@ export default class Profile extends Component {
                 <div><h5>Your email id:</h5>
                 {this.state.useremail}</div>
                 <br></br>
-                <div className="myImage">
-                <h5 className="heading">Add your Image</h5>
-					<div className="img-holder">
-						<img src={this.state.profileImg} alt="" id="img" className="img" />
-					</div>
-					<input type="file" accept="image/*" name="image-upload" id="input" onChange={this.imageHandler} />
-					<div className="label">
-          <label className="image-upload" htmlFor="input">
-						
-						Upload your Photo
-					</label>
-                </div> 
-                </div>
+            <div className="ImgUpload">
+            <form onSubmit={this.onSubmit}>
+                        <div className="form-group">
+                            <input type="file" onChange={this.onFileChange} />
+                        </div>
+                        <div className="form-group">
+                            <button className="btn btn-primary" type="submit">Upload</button>
+                        </div>
+                    </form>
+            </div>
         </center>
             
         )
