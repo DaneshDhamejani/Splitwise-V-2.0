@@ -4,6 +4,10 @@ import "../Signup/Signup.css";
 import axios from 'axios';
 import {Redirect} from 'react-router';
 import backendServer from "../../webConfig";
+import PropTypes from 'prop-types';
+import { connect } from "react-redux";
+import {signup} from "../../actions/actions.js";
+var swal = require('sweetalert')
 
 class Signup extends Component {
     constructor(props) {
@@ -48,28 +52,22 @@ class Signup extends Component {
             email: this.state.email,
             password: this.state.password
         }
-        console.log("Sending data")
-        console.log("After Sending data")
-
-        axios.defaults.withCredentials = true;
-        axios.post(`${backendServer}/osignup`, data).then(response => {
-            console.log("Status Code : ", response.status);
-            console.log("Data Sent ", response.data);
-            if (response.status === 200) {
-                this.setState({userCreated: true})
-                localStorage.setItem('user',this.state.email)
-
-                window.location.reload();
-            } 
-            
-            else if (response.status === 202) {
-                this.setState({userCreated: false, error: response.data})
-
-            }
-
-        });
-
     }
+        componentWillReceiveProps(nextProps) {
+            console.log("nextProps.ss.signupstatus", JSON.stringify(nextProps.ss.signupstatus));
+            if(nextProps.ss.signupstatus) {
+                console.log("nextProps.ss.signupstatus", nextProps.ss.signupstatus);
+                // this.props.posts.unshift(nextProps.newPost);
+            }
+            else if(nextProps.ss.signupstatus==true) {
+                swal("You are successfully signed up!", "Please Login now.", "success");
+                this.setState({ userCreated :true })
+            }
+            else if(nextProps.ss.signupstatus==false) {
+                this.setState({ userCreated : false })
+            }
+        }
+    
 
 
     render() {
@@ -148,4 +146,17 @@ class Signup extends Component {
     }
 }
 
-export default Signup;
+
+Signup.propTypes = {
+    signup : PropTypes.func.isRequired,
+    ss : PropTypes.string
+  }
+
+const mapStateToProps = state => ({
+  ss : state.usersignup
+})
+
+
+
+
+export default connect(mapStateToProps,{signup})(Signup);  

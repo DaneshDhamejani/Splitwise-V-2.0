@@ -17,21 +17,11 @@ const upload = multer();
 
 const mongoose = require('mongoose');
 const uri = "mongodb+srv://danesh123:danesh123@splitwisecluster.qrygt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-const passport = require('passport')
-const jwt = require('jsonwebtoken');
-const UserModel = require('./models/user');
-require('./auth/auth');
-const routes = require('./routes/routeindex');
-const secureRoute = require('./routes/secureroutes');
-app.use('/', routes);
-app.use('/user', passport.authenticate('jwt', { session: false }), secureRoute);
+const passport = require("passport");
+const db = require("./config/keys").mongoURI;
+const users = require("./routes/users");
 
 
-app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.json({ error: err });
-  });
-  
 
 
 app.use(express.json());
@@ -46,60 +36,25 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 // use express session to maintain session data
 
 
-// Commented the below for mongo
-// app.use(session({
-//     secret: "splitwise",
-//     resave: false, // Forces the session to be saved back to the session store, even if the session was never modified during the request
-//     saveUninitialized: false, // Force to save uninitialized session to db. A session is uninitialized when it is new but not modified.
-//     duration: 60 * 60 * 1000, // Overall duration of Session : 30 minutes : 1800 seconds
-//     activeDuration: 5 * 60 * 1000
-// }));
-// Commented the above for mongo
 
-
-// mongoose.connect(uri, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-//   })
-//   .then(() => {
-//     console.log("MongoDB Connected…")
-//   })
-//   .catch(err => console.log(err))
-
-
-mongoose.connect(uri, { useMongoClient: true });
-mongoose.connection.on('error', error => console.log(error) );
-mongoose.Promise = global.Promise;
+mongoose
+  .connect(
+    db,
+    { useNewUrlParser: true }
+  )
+  .then(() => console.log("MongoDB successfully connected"))
+  .catch(err => console.log(err));
 
 
 
+// Passport middleware
+app.use(passport.initialize());
+// Passport config
+require("./config/passport")(passport);
+// Routes
+app.use("/users", users);
 
 
-
-
-// const con = mysql.createConnection
-// ({host: "splitwiselab1db.cuo9mbgyeo0i.us-east-2.rds.amazonaws.com", 
-// user: "admin", 
-// password: "danesh123", 
-// database: "splitwise"});
-
-
-// const con = mysql.createPool({
-//     connectionLimit: 10,
-//     host: "splitwiselab1db.cuo9mbgyeo0i.us-east-2.rds.amazonaws.com",
-//     user: "admin",
-//     password: "danesh123",
-//     ssl: true,
-//     database: "splitwise",
-//   });
-
-
-// app.use(bodyParser.urlencoded({extended: false}));
-// app.use(bodyParser.urlencoded({extended: true}));
-
-// con.connect(function (err) {
-//     console.log("Connected!");
-// });
 
 
 app.post('/osignup', function (req, res) {
