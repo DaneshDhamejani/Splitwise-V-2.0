@@ -9,9 +9,10 @@ export const SIGNUP_EMAIL = "SIGNUP_EMAIL"
 
 export const signup = (values) => dispatch => {
     console.log("Actions SIGNUP :", values)
+    console.log("In action",backendServer)
     axios.defaults.withCredentials = true;
     const request = axios
-        .post(`${backendServer}/signup`, values)
+        .post(`${backendServer}/users/signup`, values)
         .then((res) => {
             console.log("Response actions signup:",res)
             if (res.status === 200 ) {

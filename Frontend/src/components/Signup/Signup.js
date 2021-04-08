@@ -52,7 +52,9 @@ class Signup extends Component {
             email: this.state.email,
             password: this.state.password
         }
+        this.props.signup(data);
     }
+    
         componentWillReceiveProps(nextProps) {
             console.log("nextProps.ss.signupstatus", JSON.stringify(nextProps.ss.signupstatus));
             if(nextProps.ss.signupstatus) {

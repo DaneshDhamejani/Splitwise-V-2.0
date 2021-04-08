@@ -1,6 +1,6 @@
-import { SIGNUP_ERROR } from '../actions';
-import { SIGNUP_SUCCESS } from '../actions';
-import { SIGNUP_EMAIL } from '../actions';
+import { SIGNUP_ERROR } from '../actions/actions';
+import { SIGNUP_SUCCESS } from '../actions/actions';
+import { SIGNUP_EMAIL } from '../actions/actions';
 import { reducer as formReducer } from "redux-form";
 
 

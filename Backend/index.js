@@ -57,28 +57,28 @@ app.use("/users", users);
 
 
 
-app.post('/osignup', function (req, res) {
-    console.log(req.body)
-    console.log("Inside Signup Post");
-    const name = req.body.name;
-    const email = req.body.email;
-    // const properemail = (req.body.email).replace("%40", "@")
-    const password = req.body.password;
+// app.post('/osignup', function (req, res) {
+//     console.log(req.body)
+//     console.log("Inside Signup Post");
+//     const name = req.body.name;
+//     const email = req.body.email;
+//     // const properemail = (req.body.email).replace("%40", "@")
+//     const password = req.body.password;
 
-    var salt = bcrypt.genSaltSync(10);
-    var encryptedpassword = bcrypt.hashSync(password, salt);
+//     var salt = bcrypt.genSaltSync(10);
+//     var encryptedpassword = bcrypt.hashSync(password, salt);
 
 
-    con.query("INSERT INTO user_table (`name`,`email`,`password`) VALUES (?,?,?)", [
-        name, email, encryptedpassword
-    ], (err, result) => {
-        console.log(err);
-        if (result) {
-            res.status(200).json({message: "signUp Successful"});
-        }
+//     con.query("INSERT INTO user_table (`name`,`email`,`password`) VALUES (?,?,?)", [
+//         name, email, encryptedpassword
+//     ], (err, result) => {
+//         console.log(err);
+//         if (result) {
+//             res.status(200).json({message: "signUp Successful"});
+//         }
 
-    })
-})
+//     })
+// })
 
 
 app.post('/ologin', function (req, res) {
