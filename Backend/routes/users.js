@@ -94,4 +94,21 @@ router.post("/login", (req, res) => {
     });
   });
 
+
+  router.post("/getnamefordashboard", async (req, res) => {
+    try{
+    console.log("Inside Get username Post Request");
+
+    
+    useremail = req.body.useremail
+    console.log(useremail)
+    const dashboardname= await User.find({email:useremail},{name:1});
+
+    res.status(200).json({username: dashboardname});
+}catch (error)
+{
+    res.writeHead(400, {'Content-Type': 'text/plain'})
+}
+});
+
   module.exports = router;

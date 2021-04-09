@@ -21,5 +21,9 @@ groupmembers: {
     type: Array,
     default: [],
   },
+groupmembersacceptinvite: {
+    type: Array,
+    default: [],
+  },
 });
 module.exports = Group = mongoose.model("groups", GroupSchema);

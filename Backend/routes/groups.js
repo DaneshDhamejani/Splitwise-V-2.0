@@ -9,11 +9,16 @@ const Group = require("../models/Group");
 router.post("/creategroup", async (req, res) => {
     try{
     console.log("Inside Create Group Post Request");
+    const groupExists = await Group.findOne({ groupname: req.body.groupname });
+    if (groupExists) 
+    res.status(401).json({message: "Group name already exists"});
+    
     groupmemberemails = req.body.groupmemberemails
     groupname = req.body.groupname
     console.log(groupname)
     console.log(groupmemberemails)
     var result = []
+    
     for (var i = 0; i < groupmemberemails.length; i++) {
         result[i] = groupmemberemails[i].value
     }
@@ -27,5 +32,8 @@ router.post("/creategroup", async (req, res) => {
     res.writeHead(400, {'Content-Type': 'text/plain'})
 }
 });
+
+
+
 
   module.exports = router;

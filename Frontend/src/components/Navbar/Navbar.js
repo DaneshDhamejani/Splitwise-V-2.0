@@ -9,7 +9,8 @@ class NavbarClass extends React.Component {
         super(props);
     }
     handleLogout = () => {
-        localStorage.removeItem('user');
+        localStorage.removeItem('myjwttoken');
+        localStorage.removeItem('useremail');
         // redirectVar = <Redirect to= "/login"/>
 
     };
@@ -17,7 +18,7 @@ class NavbarClass extends React.Component {
 
         
         // Displaying the logout button if the user is logged in
-if(localStorage.getItem("user"))
+if(localStorage.getItem("useremail"))
 {
     var userLoggedIn = (<ul className="nav navbar-nav navbar-right">
     <li>
