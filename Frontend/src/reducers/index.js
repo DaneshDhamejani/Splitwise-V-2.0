@@ -1,12 +1,12 @@
 import { combineReducers } from "redux";
 import { reducer as formReducer } from "redux-form";
 import signupreducer from  "./signupreducer";
-//import loginreducer from "./loginreducer";
+import loginreducer from "./loginreducer";
 
 
 const rootReducer = combineReducers({
     form: formReducer,
-    //login : loginreducer,
+    login : loginreducer,
     usersignup : signupreducer,
   });
   

@@ -20,7 +20,7 @@ const uri = "mongodb+srv://danesh123:danesh123@splitwisecluster.qrygt.mongodb.ne
 const passport = require("passport");
 const db = require("./config/keys").mongoURI;
 const users = require("./routes/users");
-
+const group = require("./routes/groups");
 
 
 
@@ -53,7 +53,7 @@ app.use(passport.initialize());
 require("./config/passport")(passport);
 // Routes
 app.use("/users", users);
-
+app.use("/groups", group);
 
 
 

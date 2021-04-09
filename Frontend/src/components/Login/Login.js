@@ -5,7 +5,10 @@ import axios from 'axios';
 import cookie from 'react-cookies';
 import {Redirect} from 'react-router';
 import backendServer from "../../webConfig";
-
+import PropTypes from 'prop-types';
+import { connect } from "react-redux";
+import {login} from "../../actions/actions.js";
+var loginsuccess = ""
 
 
 class Login extends Component {
@@ -44,35 +47,27 @@ submitOwnerLogin = (e) => {
       email : this.state.email,
       password : this.state.password
   }
-  axios.defaults.withCredentials = true;
+  this.props.login(data)
+}
 
-  axios.post(`${backendServer}/ologin`,data)
-            .then(response => {
-                console.log("Status Code : ",response.status);
-                console.log("Data : ",response.data);
-                if(response.status === 200){
-                  this.setState({
-                    authFlag : true
-                    
-                })
-                    localStorage.setItem('user',this.state.email)
-                    window.location.reload();
-              }else{
-                this.setState({
-                  authFlag : false,
 
-                })
-              }
-          
-          });
-          
+componentWillReceiveProps(nextProps) {
+  console.log("JSON.stringify(nextProps)", JSON.stringify(nextProps))
+  if (nextProps.ld.logindetails === true) {
+    loginsuccess = "true"
+    console.log("loginsuccess", loginsuccess)
+    console.log("nextProps.logindetails", nextProps.ld.logindetails)
+    //this.props.posts.unshift(nextProps.newPost);
   }
+  else
+    loginsuccess = "false"
+}
 
 
   render() {
     var redirectVar = null;
     
-    if(localStorage.getItem('user')){
+    if(localStorage.getItem('myjwttoken')){
           console.log("Local storage found")
           redirectVar = <Redirect to= "/dashboard"/>
         }
@@ -123,4 +118,14 @@ submitOwnerLogin = (e) => {
   }
 }
 
-export default Login;
+Login.propTypes = {
+  login : PropTypes.func.isRequired,
+  ld : PropTypes.string
+}
+
+const mapStateToProps = state => ({
+ld : state.login
+})
+
+export default connect(mapStateToProps, {login})(Login); 
+
