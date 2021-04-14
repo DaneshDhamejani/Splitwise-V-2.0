@@ -18,15 +18,15 @@ class LeftNavBar extends Component {
         }
     }
 
-    componentDidMount() {
+    // componentDidMount() {
         
         
-        axios.get(`${backendServer}/odashboard/` + useremail).then((response) => {
+    //     axios.get(`${backendServer}/odashboard/` + useremail).then((response) => {
             
-            this.setState({usergroups: response.data});
+    //         this.setState({usergroups: response.data});
             
-        });
-    }
+    //     });
+    // }
     render() {
         
         return (

@@ -8,11 +8,14 @@ const validateRegisterInput = require("../validation/register");
 const validateLoginInput = require("../validation/login");
 // Load User model
 const User = require("../models/User");
+const multer = require("multer");
+// const upload = multer();
+const { v4: uuidv4 } = require('uuid');
+uuidv4();
 
 
 
-// @desc Register user
-// @access Public
+
 router.post("/signup", (req, res) => {
   // Form validation
 const { errors, isValid } = validateRegisterInput(req.body);
@@ -69,7 +72,7 @@ router.post("/login", (req, res) => {
           // Create JWT Payload
           const payload = {
             id: user.id,
-            name: user.name
+            name: user.name,
           };
   // Sign token
           jwt.sign(
@@ -81,7 +84,8 @@ router.post("/login", (req, res) => {
             (err, token) => {
               res.json({
                 success: true,
-                token: "Bearer " + token
+                token: "Bearer " + token,
+                email:user.email
               });
             }
           );
@@ -111,4 +115,7 @@ router.post("/login", (req, res) => {
 }
 });
 
-  module.exports = router;
+
+
+
+module.exports = router;

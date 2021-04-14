@@ -18,7 +18,7 @@ const UserSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  profilepic: {
+  profileImg: {
     type: String
 },
 groups_added: {

@@ -37,8 +37,16 @@ export const signup = (values) => dispatch => {
             .then((res) => {
                 console.log("Response actions signup:",res)
                 if (res.status === 200 ) {
+                    console.log(res.data)
                     console.log("My token is:",res.data.token)
                     console.log("Inside Login Success")
+                    
+                    // var userdetails={
+                    //     myjwttoken:res.data.token,
+                    //     useremail:values.email}
+
+                    // localStorage.setItem('userdetails',userdetails);   
+                    console.log("checking")
                     localStorage.setItem('myjwttoken', res.data.token);
                     localStorage.setItem('useremail', values.email);
                     dispatch({

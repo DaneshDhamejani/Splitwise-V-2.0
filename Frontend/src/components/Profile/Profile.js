@@ -8,59 +8,34 @@ import backendServer from "../../webConfig";
 
 
 
-var useremail = localStorage.getItem('user')
+var useremail = localStorage.getItem('useremail')
+var username=localStorage.getItem('username')
 
 export default class Profile extends Component {
     constructor(props) {
         super(props);
         this.state = {
             useremail:useremail,
-            username:"",
+            username:username,
             profileImg: ''
         }
         
     }
-    imageHandler = (e) => {
-        const reader = new FileReader();
-        reader.onload = () =>{
-          if(reader.readyState === 2){
-            this.setState({profileImg: reader.result})
-          }
-        }
-        reader.readAsDataURL(e.target.files[0])
-      };
+    onFileChange(e) {
+        this.setState({ profileImg: e.target.files[0] })
+    }
     
-  
-    componentDidMount() {
-        var data = {
-            useremail: this.state.useremail
-        }
-        
-        axios.post(`${backendServer}/profile`,data)
-                    .then((response) => {
-                        console.log("profile page of frontend")
-                        console.log(response.data)
-                         this.setState({username: response.data[0].name});
-                         console.log("Checking whether username are there or not", this.state.username)
 
-                    })
-        // axios.post("http://localhost:3001/profilepic"+useremail,data)
-        //             .then((response) => {
-        //                 console.log("profile page of frontend")
-        //                 console.log(response.data)
-        //                 // this.setState({username: response.data[0].name});
-        //                 // console.log("Checking whether username are there or not", this.state.username)
-
-        //             })
-
+    onSubmit(e) {
+        e.preventDefault()
+        const formData = new FormData()
+        formData.append('profileImg', this.state.profileImg)
+        axios.post("http://localhost:4000/api/user-profile", formData, {
+        }).then(res => {
+            console.log(res)
+        })
     }
-    fileSelectedHandler=(e)=>{
-        console.log(e.target.files[0])
-    }
-    fileUploadHandler=(e)=>
-    {
 
-    }
     
     render() {
         return (

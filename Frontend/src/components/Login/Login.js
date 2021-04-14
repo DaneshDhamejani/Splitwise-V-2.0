@@ -67,7 +67,7 @@ componentWillReceiveProps(nextProps) {
   render() {
     var redirectVar = null;
     
-    if(localStorage.getItem('myjwttoken')){
+    if(localStorage.getItem('myjwttoken') && localStorage.getItem('useremail') ){
           console.log("Local storage found")
           redirectVar = <Redirect to= "/dashboard"/>
         }

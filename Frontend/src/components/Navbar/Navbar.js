@@ -4,13 +4,18 @@ import logo from '../assets/splitwise_logo.png';
 import {Link} from "react-router-dom";
 import {Redirect} from 'react-router';
 var redirectVar = null;
+var username = localStorage.getItem('username')
+
 class NavbarClass extends React.Component {
     constructor(props) {
         super(props);
     }
     handleLogout = () => {
+        
+        
         localStorage.removeItem('myjwttoken');
         localStorage.removeItem('useremail');
+        localStorage.removeItem('username')
         // redirectVar = <Redirect to= "/login"/>
 
     };

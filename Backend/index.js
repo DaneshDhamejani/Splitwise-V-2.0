@@ -12,8 +12,7 @@ const fs = require("fs");
 const util = require("util");
 const pipeline = util.promisify(require("stream").pipeline);
 // app.use(express.static(__dirname + "/public"));    Commented this for mongo
-const multer = require("multer");
-const upload = multer();
+
 
 const mongoose = require('mongoose');
 const uri = "mongodb+srv://danesh123:danesh123@splitwisecluster.qrygt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
@@ -21,6 +20,7 @@ const passport = require("passport");
 const db = require("./config/keys").mongoURI;
 const users = require("./routes/users");
 const group = require("./routes/groups");
+const fileRoutes = require("./routes/imageupload");
 
 
 
@@ -54,6 +54,7 @@ require("./config/passport")(passport);
 // Routes
 app.use("/users", users);
 app.use("/groups", group);
+app.use("/upload", fileRoutes);
 
 
 
