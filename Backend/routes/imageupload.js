@@ -13,6 +13,8 @@ const {uploadFile,getFileStream} = require("../services/file-upload")
 
 router.post("/imageupload", upload.single("file"), async function (req, res) {
   try{
+    console.log("Inside API")
+    console.log(req.file)
   const file = req.file;
   console.log(file.path)
   //console.log(file);
@@ -25,7 +27,6 @@ router.post("/imageupload", upload.single("file"), async function (req, res) {
   await unlinkFile(file.path);
   console.log("Hello")
   console.log(result);
-  const description = req.body.description;
   // const user= new User();
   // user.profileImg=result.Location
   console.log("I am here")
