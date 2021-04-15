@@ -19,7 +19,8 @@ const UserSchema = new Schema({
     default: Date.now
   },
   profileImg: {
-    type: String
+    type: String,
+    default: 'https://splitwisebucket1.s3.us-east-2.amazonaws.com/depositphotos_52374307-stock-illustration-blue-profile-icon.jpg',
 },
 groups_added: {
   type: Array,
