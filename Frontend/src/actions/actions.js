@@ -19,6 +19,7 @@ export const signup = (values) => dispatch => {
         .then((res) => {
             console.log("Response actions signup:",res)
             if (res.status === 200 ) {
+                localStorage.setItem('signupcheck', true);
                 dispatch({
                     type: SIGNUP_SUCCESS,
                     payload: true

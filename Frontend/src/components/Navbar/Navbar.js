@@ -15,7 +15,8 @@ class NavbarClass extends React.Component {
         
         localStorage.removeItem('myjwttoken');
         localStorage.removeItem('useremail');
-        localStorage.removeItem('username')
+        localStorage.removeItem('username');
+        localStorage.removeItem('signupcheck');
         // redirectVar = <Redirect to= "/login"/>
 
     };

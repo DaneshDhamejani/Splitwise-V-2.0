@@ -18,7 +18,8 @@ class Signup extends Component {
             email: null,
             password: null,
             error: "",
-            userCreated: false
+            userCreated: false,
+            
         }
 
 
@@ -75,12 +76,14 @@ class Signup extends Component {
     render() {
         var redirectVar = null;
 
-        if (localStorage.getItem('user')) {
+        if (localStorage.getItem('signupcheck')) 
+        {
             console.log("Local storage found")
-            redirectVar = <Redirect to="/dashboard"/>
+            redirectVar = <Redirect to="/login"/>
         }
         return (
             <div className="container">
+                {redirectVar}
                 <div className="row">
                     <img src={logo}
                         class="col-md-3"
