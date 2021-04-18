@@ -6,7 +6,7 @@ import Nav from "react-bootstrap/Nav";
 import Select, {components} from 'react-select';
 import backendServer from "../../webConfig";
 
-var useremail = localStorage.getItem('user')
+
 
 export default class Addgroup extends Component {
     constructor(props) {
@@ -18,59 +18,73 @@ export default class Addgroup extends Component {
             groupCreated: false,
             error: "",
             groupName:null,
-            redirectVar:null
+            redirectVar:null,
+            useremail:localStorage.getItem('useremail')
         }
-        this.handleChange = this.handleChange.bind(this);
-        this.handleCreateGroup = this.handleCreateGroup.bind(this);
         this.handleGroupName = this.handleGroupName.bind(this);
-    }
-
-
-    async getOptions() {
-        const res = await axios.get(`${backendServer}/getuserlist/` + useremail)
-        const data = res.data
-        console.log(res.data)
-        let options = data.map(d => ({"value": d.email, "label": d.email}))
-
-        this.setState({emailList: options})
-
-    }
-
-    handleChange = (opt) => {
-      let memberlist=[]
-      memberlist.push(opt)
-      console.log(memberlist)
-      this.setState({ value: memberlist })
-      
+        this.handleChange = this.handleChange.bind(this);
+       
     }
 
     handleGroupName = (e) => {
-      this.setState({
-        groupName : e.target.value
+        this.setState({
+          groupName : e.target.value
+  
+      })
+    }
 
-    })
+    handleChange = (opt) => {
+        console.log(opt)
+        let memberlist=[]
+        for(let i=0;i<opt.length;i++)
+        {
+            memberlist.push(opt[i].value)
+        }
+        console.log(memberlist)
+        this.setState({ value: memberlist })
+        
+      }
+
+      handleCreateGroup = (e) => { // console.log("Checking the value of value array",this.state.value)
+      e.preventDefault();
+      const data = {
+          groupmemberemails: this.state.value,
+          groupname: this.state.groupName,
+          useremail:this.state.useremail
+      }
+      console.log(data.groupmemberemails)
+      axios.post(`${backendServer}/groups/creategroup/`,data).then(response => {
+          console.log("Status Code : ", response.status);
+          console.log("Data Sent ", response.data);
+          if (response.status === 200) {
+              this.setState({groupCreated: true,
+              redirectVar:<Redirect to="/dashboard"/>})
+          } else if (response.status === 202) {
+              this.setState({groupCreated: false, error: response.data})
+
+          }
+
+      });
+
   }
 
-    handleCreateGroup = (e) => { // console.log("Checking the value of value array",this.state.value)
-        e.preventDefault();
-        const data = {
-            groupmemberemails: this.state.value,
-            groupname: this.state.groupName
+    
+    async getOptions() {
+        var data=
+        {
+            useremail:this.state.useremail
         }
-        axios.post(`${backendServer}/creategroup/`+useremail, data).then(response => {
-            console.log("Status Code : ", response.status);
-            console.log("Data Sent ", response.data);
-            if (response.status === 200) {
-                this.setState({groupCreated: true,
-                redirectVar:<Redirect to="/dashboard"/>})
-            } else if (response.status === 202) {
-                this.setState({groupCreated: false, error: response.data})
+        axios.post(`${backendServer}/users/allusersexceptself`, data).then((response) => {
+            console.log("Got response from backend", response.data.allemails)
+            let allmails=response.data.allemails
+            let options = allmails.map(d => ({"value": d, "label": d}))
+            this.setState({emailList: options});
+            
+    })
 
-            }
+}
 
-        });
 
-    }
 
 
     componentDidMount() {
@@ -80,12 +94,7 @@ export default class Addgroup extends Component {
 
     render() {
         
-    if (!localStorage.getItem('user')) {
-                this.setState({
-                redirectVar: <Redirect to="/login"/>
-            })
-        }
-                
+
         
         return (<div>
             <div className="row">

@@ -21,7 +21,7 @@ const db = require("./config/keys").mongoURI;
 const users = require("./routes/users");
 const group = require("./routes/groups");
 const fileRoutes = require("./routes/imageupload");
-
+const bills = require("./routes/bills");
 
 
 app.use(express.json());
@@ -55,7 +55,7 @@ require("./config/passport")(passport);
 app.use("/users", users);
 app.use("/groups", group);
 app.use("/upload", fileRoutes);
-
+app.use("/bills", bills);
 
 
 // app.post('/osignup', function (req, res) {

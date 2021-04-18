@@ -5,7 +5,6 @@ import Modal from "react-bootstrap/Modal";
 import { Button, Form, FormControl, ControlLabel } from "react-bootstrap";
 import backendServer from "../../webConfig";
 
-var useremail = localStorage.getItem('user')
 
 
 class Grouppage extends Component {
@@ -20,7 +19,7 @@ class Grouppage extends Component {
             billadded:false,
             error:"",
             allbillsinfo:[],
-            useremail:useremail,
+            useremail:localStorage.getItem("useremail"),
             memberemails:[],
             moneypendingtopay:0,
             moneytoget:0
@@ -63,9 +62,17 @@ class Grouppage extends Component {
 
 
         console.log("Number of members:",numberofmembers)
+        console.log("Group name:",this.state.groupname)
+        console.log("Member names:",this.state.membernames)
+        console.log("User email:",this.state.useremail)
+        console.log("Member emails:",this.state.memberemails)
+        console.log("Bill description:",this.state.expensedescription)
+        console.log("Bill amount:",this.state.amount)
+        
+
         var data = {
-        expensedescription: this.state.expensedescription,
-        amount: this.state.amount,
+        billdescription: this.state.expensedescription,
+        billamount: this.state.amount,
         groupname:this.state.groupname,
         numberofmembers:numberofmembers,
         membernames:this.state.membernames,
@@ -74,7 +81,7 @@ class Grouppage extends Component {
         }
 
         console.log("Amount:",this.state.amount)
-        axios.post(`${backendServer}/addbill`,data)
+        axios.post(`${backendServer}/bills/addbill`,data)
             .then(response => {
                 console.log("Status Code : ",response.status);
                 console.log("Data Sent ",response.data);
@@ -94,14 +101,12 @@ class Grouppage extends Component {
             console.log("Successfully bill added:",this.state.billadded)
             
             
-            axios.post(`${backendServer}/getallbills`,data)
+            axios.post(`${backendServer}/bills/getallbills`,data)
             .then(response => {
-                console.log("Status Code : ",response.status);
-                console.log(response.data)
-                this.setState({usergroups: response.data});
-                console.log("Checking whether users in groups are there or not", this.state.usergroups)
+                console.log("Got response for get all bills")
+                console.log(response.data.allbillsinfo)
                 this.setState({
-                    allbillsinfo:response.data,
+                    allbillsinfo:response.data.allbillsinfo,
                     show : false
                 }) 
             });
@@ -118,58 +123,42 @@ class Grouppage extends Component {
                 groupname:this.state.groupname,
                 useremail:this.state.useremail
                 }
+            var dataforgroups={
+                groupname:this.state.groupname
+            }
 
-        // console.log(this.props.location.pathname) // Working
-        // console.log(this.props.history.location.pathname) // This too works
+        console.log("Got group name!",this.state.groupname)
          console.log(this.props.history.location.pathname.substring(8)) //Getting the exact apartment number
-         axios.get(`${backendServer}/groups/`+this.state.groupname)
+         axios.post(`${backendServer}/groups/getgroupmembers`,dataforgroups)
                     .then((response) => {
                         console.log("Inside app.get of frontend")
-                        console.log(response.data)
-                        this.setState({membernames: response.data});
+                        console.log("Got group members:",response.data.groupmembers)
+                        this.setState({membernames: response.data.groupmembers});
                         console.log("Checking whether users in groups are there or not", this.state.membernames)
 
                     })
 
-                    axios.post(`${backendServer}/getallbills`,data)
+                    axios.post(`${backendServer}/bills/getallbills`,data)
                     .then(response => {
-                        console.log("Status Code : ",response.status);
-                        console.log(response.data)
-                        this.setState({usergroups: response.data});
-                        console.log("Checking whether users in groups are there or not", this.state.usergroups)
+                        console.log("Got response for get all bills")
+                        console.log(response.data.allbillsinfo)
                         this.setState({
-                            allbillsinfo:response.data,
+                            allbillsinfo:response.data.allbillsinfo,
                             show : false
-                        }) 
+                    }) 
                     });
-                    console.log("Bills info is here",this.state.allbillsinfo)
+            console.log("Bills info is here",this.state.allbillsinfo)
+                    
 
-                    axios.post(`${backendServer}/fetchemails`,data)
+                    axios.post(`${backendServer}/groups/fetchemails`,data)
                     .then((response) => {
                         console.log("Getting user emails at frontend")
-                        console.log(response.data)
-                        this.setState({memberemails: response.data});
+                        console.log(response.data.groupmemberemails)
+                        this.setState({memberemails: response.data.groupmemberemails});
                         console.log("Checking whether users in groups are there or not", this.state.memberemails)
 
                     })
 
-                    // axios.post("http://localhost:3001/getmoneytopay",data)
-                    // .then((response) => {
-                    //     console.log("Getting money I owe at frontend")
-                    //     console.log(response.data)
-                    //     this.setState({moneypendingtopay: response.data});
-                    //     console.log("Amount I owe", this.state.moneypendingtopay)
-
-                    // })
-
-                    // axios.post("http://localhost:3001/moneytoget",data)
-                    // .then((response) => {
-                    //     console.log("Getting money I will get at frontend")
-                    //     console.log(response.data)
-                    //     this.setState({moneytoget: response.data});
-                    //     console.log("Amount I owe", this.state.moneytoget)
-
-                    // })
 
 
 
@@ -190,7 +179,7 @@ class Grouppage extends Component {
                 <div className="col-md-3">
                 <b>Members of {this.state.groupname}:</b>
                 {this.state.membernames.map((user) => (
-                <ul><li>{user.name}</li></ul>
+                <ul><li>{user}</li></ul>
                 
             ))}
             </div>
@@ -227,7 +216,7 @@ class Grouppage extends Component {
                 
                 </Modal>
                 {this.state.allbillsinfo.map((user) => (
-                <ul><li><b>Description:</b>{user.description}<br></br><b>Amount:</b>{user.total_amount}</li></ul>
+                <ul><li><b>Description:</b>  {user.billdescription}<br></br><b>Amount:</b>  {user.billamount}</li></ul>
                 ))}
     
             </div>

@@ -116,6 +116,31 @@ router.post("/login", (req, res) => {
 });
 
 
+router.post("/allusersexceptself", async (req, res) => {
+  try{
+  console.log("Inside All users except self Request");
+  useremail = req.body.useremail
+  console.log(useremail)
+  const allemails= await User.find({},{"email":1});
+  console.log(allemails[0].email)
+  allemailsexceptself=[]
+  for(let i=0;i<allemails.length;i++)
+  {
+    var currentemail=allemails[i].email
+    console.log(currentemail)
+    if(currentemail!=useremail)
+    {
+      allemailsexceptself.push(currentemail)
+    }
+  }
+  console.log(allemailsexceptself)
+  res.status(200).json({allemails: allemailsexceptself});
+}catch (error)
+{
+  res.writeHead(400, {'Content-Type': 'text/plain'})
+}
+});
+
 
 
 module.exports = router;

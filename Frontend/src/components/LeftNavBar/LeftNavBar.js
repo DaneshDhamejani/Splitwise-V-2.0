@@ -6,7 +6,7 @@ import { withRouter } from 'react-router-dom';
 import history from 'history';
 import backendServer from "../../webConfig";
 
-var useremail = localStorage.getItem('user')
+
 
 class LeftNavBar extends Component {
     
@@ -14,19 +14,27 @@ class LeftNavBar extends Component {
         super(props);
 
         this.state = {
-            usergroups: []
+            usergroups: [],
+            myemail:localStorage.getItem('useremail')
         }
     }
 
-    // componentDidMount() {
+     async componentDidMount() {
+
+        var data={
+            useremail:this.state.myemail
+        }
+        console.log("Found email here",this.state.myemail)
         
-        
-    //     axios.get(`${backendServer}/odashboard/` + useremail).then((response) => {
+         await axios.post(`${backendServer}/groups/getallgroupsaccepted/`,data).then((response) => {
+            console.log("Inside get all groups")
+            //console.log("Got response",response.data.groups[0].groups_added)
+            this.setState({usergroups: response.data.groups[0].groups_added});
             
-    //         this.setState({usergroups: response.data});
-            
-    //     });
-    // }
+        });
+    }
+
+
     render() {
         
         return (
@@ -36,11 +44,11 @@ class LeftNavBar extends Component {
                <Nav.Link href="/dashboard">Dashboard</Nav.Link>
                 <Nav.Link href="/addgroup">Add a new group</Nav.Link>
                 <Nav.Link href="/profile">Your Profile</Nav.Link>
-                <Nav.Link href={`/activity/${useremail}`} >Recent Activity</Nav.Link>
-                <Nav.Link href={`/invitation/${useremail}`} >View Invitations</Nav.Link>
+                <Nav.Link href={`/activity/${this.state.myemail}`} >Recent Activity</Nav.Link>
+                <Nav.Link href={`/invitation/${this.state.myemail}`} >View Invitations</Nav.Link>
                 {this.state.usergroups.map((user) => (
-                <Nav.Link className="user" href={`/groups/${user.group_name}`}>
-                {user.group_name}
+                <Nav.Link className="user" href={`/groups/${user}`}>
+                {user}
                 </Nav.Link>
                 ))}
                 

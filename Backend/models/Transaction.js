@@ -12,4 +12,4 @@ receiver: {
     type: String
   }
 });
-module.exports = User = mongoose.model("transaction", TransactionSchema);
+module.exports = Transaction = mongoose.model("transaction", TransactionSchema);

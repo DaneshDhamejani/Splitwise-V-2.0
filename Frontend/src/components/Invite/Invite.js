@@ -19,8 +19,9 @@ export default class Invite extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            allusergroups:[],
-            currentgroupname:""
+            allgroupsinvited:[],
+            currentgroupname:"",
+            useremail:localStorage.getItem('useremail')
         }
         this.handleGroupSelect = this.handleGroupSelect.bind(this);
         this.handleModalClose = this.handleModalClose.bind(this);
@@ -44,15 +45,15 @@ export default class Invite extends Component {
           
         handleModalSubmit= (e)=>
           {
-            var selectedgroupname="";
+            
             var data = {
-                useremail:useremail,
-                selectedgroupname:this.state.currentgroupname
+                useremail:this.state.useremail,
+                groupname:this.state.currentgroupname
             }
             console.log("State:",this.state.currentgroupname)
             console.log("Selected group name:",data.selectedgroupname)
             console.log("Printing user email:",useremail)
-             axios.post(`${backendServer}/acceptinvite`,data)
+             axios.post(`${backendServer}/groups/acceptinvite`,data)
             .then((response) => {
                 console.log("Status Code : ",response.status);
                 console.log("Data Sent ",response.data);
@@ -79,21 +80,23 @@ export default class Invite extends Component {
         componentDidMount() {
 
             var data = {
-                useremail:useremail
+                useremail:this.state.useremail
             }
             
-            axios.post(`${backendServer}/getallusergroups`, data).then((response) => {
-                console.log("Got all groups in which user is a part of on frontend",response.data)
+            axios.post(`${backendServer}/groups/allgroupsinvited`, data).then((response) => {
+                console.log("Got all groups in which user is a part of on frontend",response.data.groups[0].groups_invited)
+                var grouparray=response.data.groups[0].groups_invited
+                console.log("Group Array",grouparray)
                 var grouplist=[]
-                for(var i=0;i<response.data.length;i++)
+                for(var i=0;i<grouparray.length;i++)
                 {
-                    grouplist.push(response.data[i].group_name)
+                    grouplist.push(grouparray[i])
                 }
                 console.log(grouplist)
                 this.setState({
-                    allusergroups : grouplist
+                  allgroupsinvited : grouplist
                 })
-                console.log("Printing latest state:",this.state.allusergroups)
+                console.log("Printing latest state:",this.state.allgroupsinvited)
     
             })
         }
@@ -106,7 +109,7 @@ export default class Invite extends Component {
               <br></br>
               <br></br>
               <br></br>
-              {this.state.allusergroups.map((user) => (
+              {this.state.allgroupsinvited.map((user) => (
                 <center>
                 <Button className="user" variant="warning" /*href={`/groups/${user}`}*/ value={user} onClick={this.handleGroupSelect}>
                 {user}

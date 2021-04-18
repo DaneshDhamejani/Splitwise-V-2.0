@@ -16,5 +16,8 @@ billcreatedby: {
 billdescription: {
     type: String
   },
+groupname: {
+    type: String
+  },
 });
 module.exports = User = mongoose.model("bills", BillSchema);

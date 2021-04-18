@@ -15,8 +15,7 @@ import bg_image2 from "../assets/splitwise_home_3.png";
 
 var redirectVar = null
 
-var useremail;
-console.log(useremail)
+
 
 
 class Dashboard extends Component {
@@ -62,7 +61,7 @@ class Dashboard extends Component {
         e.preventDefault();
         // console.log("Getting name to settle up:",this.state.nametosettleup)
         var data = { // nametosettle:this.state.nametosettleup,
-            useremail,
+            useremail:this.state.useremail,
             settlemail: this.state.emailtosettle,
             useramount: this.state.useramount
 
@@ -98,13 +97,13 @@ class Dashboard extends Component {
     }
 
 
-     async componentDidMount() {
+      componentDidMount() {
 
         var data = {
             useremail: this.state.useremail
         }
         console.log("Email at frontend:", this.state.useremail)
-        await axios.post(`${backendServer}/users/getnamefordashboard`, data).then((response) => {
+         axios.post(`${backendServer}/users/getnamefordashboard`, data).then((response) => {
             console.log("Got response from backend", response)
             console.log("Got user name on Dashboard:", response.data.username[0].name)
             this.setState({username: response.data.username[0].name});
