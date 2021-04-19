@@ -22,6 +22,7 @@ const users = require("./routes/users");
 const group = require("./routes/groups");
 const fileRoutes = require("./routes/imageupload");
 const bills = require("./routes/bills");
+const transaction = require("./routes/transaction");
 
 
 app.use(express.json());
@@ -56,7 +57,7 @@ app.use("/users", users);
 app.use("/groups", group);
 app.use("/upload", fileRoutes);
 app.use("/bills", bills);
-
+app.use("/transaction", transaction);
 
 // app.post('/osignup', function (req, res) {
 //     console.log(req.body)

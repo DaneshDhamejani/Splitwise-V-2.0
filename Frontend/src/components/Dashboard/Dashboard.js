@@ -24,20 +24,22 @@ class Dashboard extends Component {
         this.state = {
             useremail: localStorage.getItem('useremail'),
             username: "",
-            totaliowe: 0,
-            totaliamowed: 0,
 
-            totalbalance: 0,
+            balance: 0,
             alluserstats: [],
             userlistoptions: [],
             nametosettleup: "",
             emailtosettle: "",
             error: "",
             alloverallstats: [],
-            owearray: [],
-            owedarray: [],
+            totalowe:[],
+            totalowed:[],
             userobjectsettle: [],
-            useramount: 0
+            useramount: 0,
+            amountowe:0,
+            amountowed:0
+            
+           
         }
         this.handleModalOpen = this.handleModalOpen.bind(this);
         this.handleModalClose = this.handleModalClose.bind(this);
@@ -52,7 +54,7 @@ class Dashboard extends Component {
     }
     handleSettleUpEmail = (e) => {
         let user = JSON.parse(e.target.value)
-        this.setState({emailtosettle: user.email, useramount: user.amount})
+        this.setState({emailtosettle: user.user, useramount: user.amount})
 
 
     }
@@ -63,24 +65,12 @@ class Dashboard extends Component {
         var data = { // nametosettle:this.state.nametosettleup,
             useremail:this.state.useremail,
             settlemail: this.state.emailtosettle,
-            useramount: this.state.useramount
+            useramount: Math.abs(this.state.useramount)
 
         }
 
-
-        // axios.post("http://localhost:3001/emailtosettle",data)
-        //     .then((response) => {
-        //         console.log("Inside getting settle up email of frontend")
-        //         console.log("Got email ID of the settler",response.data[0].email)
-        //         this.setState({emailtosettle: response.data[0].email});
-        // getFinalAmounts(response.data[0].email);
-
-        //     })
-
-        // const getFinalAmounts = async (email) => {
-        /*  await */
         
-        axios.post(`${backendServer}/settleup`, data).then((response) => {
+        axios.post(`${backendServer}/transaction/settleup`, data).then((response) => {
             console.log("Status Code : ", response.status);
             console.log("Data Sent ", response.data);
             if (response.status === 200) {
@@ -97,26 +87,83 @@ class Dashboard extends Component {
     }
 
 
-      componentDidMount() {
+      async componentDidMount() {
 
         var data = {
             useremail: this.state.useremail
         }
         console.log("Email at frontend:", this.state.useremail)
-         axios.post(`${backendServer}/users/getnamefordashboard`, data).then((response) => {
+        await axios.post(`${backendServer}/users/getnamefordashboard`, data).then((response) => {
             console.log("Got response from backend", response)
             console.log("Got user name on Dashboard:", response.data.username[0].name)
             this.setState({username: response.data.username[0].name});
             console.log("Name found here:", response.data.username[0].name)
             localStorage.setItem("username", response.data.username[0].name)
-            
-            
-            
-            
 
         })
+
+        // await axios.post(`${backendServer}/transaction/amountowed`, data).then((response) => {
+        //     console.log("Got Amount Owed", response.data.amountowed)
+        //     // this.setState({totalowed: response.data.amountowed});
+        //     // console.log("Printing total owed",this.state.totalowed)
+
+        // })
+
+        // await axios.post(`${backendServer}/transaction/amountowe`, data).then((response) => {
+        //     console.log("Got Amount Owe", response.data.amountowe)
+        //     // this.setState({totalowe: response.data.amountowe});
+        //     // console.log("Printing total owe",this.state.totalowe)
+        // })
+        // // let totalbalancedue=this.state.totalowed-this.state.totalowe
+        // // console.log(totalbalancedue)
+        // // this.setState({totalbalance: totalbalancedue});
+
+
+
+          await axios.post(`${backendServer}/transaction/allstats`, data).then((response) => {
+             console.log("Got All stats on frontend", response.data.Alluserstats)
+             let allstats=response.data.Alluserstats
+             console.log("All stats",allstats)
+             let owe=[]
+             let owed=[]
+             let owetotal=0
+             let owedtotal=0
+             let totalbalance=0
+             for(let i=0;i<allstats.length;i++)
+             {
+                 var stat=allstats[i]
+                 console.log("Yo",allstats[i])
+                 if(stat.balance<0)
+                 {
+                    owe.push({"user":stat.user,"amount":stat.balance})
+                    owetotal=owetotal+Math.abs(stat.balance)
+
+                 }
+                 else if(stat.balance>0)
+                 {
+                    owed.push({"user":stat.user,"amount":stat.balance})
+                    owedtotal=owedtotal+Math.abs(stat.balance)
+                 }
+             }
+             console.log("OWE:",owe)
+             console.log("OWED",owed)
+             this.setState({
+                totalowe: owe,
+                totalowed: owed,
+                amountowe:owetotal,
+                amountowed:owedtotal
+                })
+            totalbalance=this.state.amountowed-this.state.amountowe
+            this.setState({balance:totalbalance})
+            console.log("Printing state owe:",this.state.totalowe)
+            console.log("Printing state owed",this.state.totalowed)
+            console.log("Printing state balance",this.state.balance)
+
             
-        }
+
+       
+    })
+}
         
         
     
@@ -126,20 +173,80 @@ class Dashboard extends Component {
        
         return (
             <div>
+            <div name="dashboarddisplay">
                 <center>
-                    <h3>{
+                    <h3 data-testid="Dashboard">{
                         this.state.username
                     }'s Dashboard</h3>
                 </center>
-                <div className="row">
-                    <div className="col-md-3">
-                        <div ClassName="myNavBar">
-                            <LeftNavBar/>
-                        </div>
+                <br></br>
+               <center><Button onClick={this.handleModalOpen}>Settle up</Button></center>
+               <Modal show={this.state.show}>
+            <Modal.Header>Settle up</Modal.Header>
+            <Modal.Body>
+            <Form>
+                <Form.Group>
+            <Form.Label>Select Who You Want to Settle Up With :</Form.Label>
+            <Form.Control
+              as="select"
+            onChange={this.handleSettleUpEmail}
+            >
+              <option selected disabled hidden>
+                Select one person
+              </option>
+              {this.state.totalowe.map((user) => (
+                <option value={JSON.stringify(user)}>
+                  {user.user}: &nbsp; {Math.abs(user.amount)}
+                </option>
+              ))}
+            </Form.Control>
+          </Form.Group>
+             </Form>
+            </Modal.Body>
+        <Modal.Footer>
+            <Button onClick={this.handleModalClose}>
+                Close Bill
+            </Button>
+            <Button onClick={this.submitSettleUp}>
+                Save Changes
+            </Button>
+        </Modal.Footer>
+            
+            </Modal>
+            </div>
+            <div className="row">
+                <div className="col-md-3">
+                <div ClassName="myNavBar">
+                    <LeftNavBar/>
+                    </div>
 
+                </div>
+                <div className="col-md-3">
+                    <b>Total balance</b>
+                    <div><b>$ </b>{this.state.balance}</div>
+                </div>
+                <div className="col-md-3">
+                    <b>You owe</b>
+                    <div><b>$ </b>{this.state.amountowe}
+                    </div><br></br>
+                    <div>
+                    {this.state.totalowe.map((abc) => (
+            <ul><li>You owe <b>{abc.user}</b> <b>$</b>{Math.abs(abc.amount)}</li></ul>
+            ))}
                     </div>
                 </div>
+                <div className="col-md-3">
+                    <b>You are owed</b>
+                    <div><b>$ </b>{this.state.amountowed}</div><br></br>
+                    <div>
+                    {this.state.totalowed.map((abc) => (
+            <ul><li><b>{abc.user}</b> owes you <b>$</b>{abc.amount}</li></ul>
+            ))}
+                    </div>
+                </div>
+
             </div>
+            {redirectVar} </div>
         );
     }
 }
