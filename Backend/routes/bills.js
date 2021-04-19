@@ -82,4 +82,72 @@ router.post("/getallbills/", async (req, res) => {
 }
 });
 
+
+
+// router.post("/recentactivity/", async (req, res) => {
+//     try{
+//        console.log("Inside Get  All Bills")
+//         var useremail=req.body.useremail
+//         const allgroupsadded= await User.find({"email":useremail},{groups_added:1,_id:0});
+//         //console.log(allgroupsadded[0].groups_added)
+//         let grouparray=[]
+//         grouparray=allgroupsadded[0].groups_added
+//         console.log(grouparray)
+//         let recentactivity=[]
+//         for(let i=0;i<grouparray.length;i++)
+//         {
+//             let currentgroup=grouparray[i]
+//             console.log(currentgroup)
+//             let allbillstats= await Bill.find({"groupname":currentgroup},{billcreatedby:1,billdescription:1,billamount:1,_id:0,billdate:1,groupname:1});
+            
+//             recentactivity.push(allbillstats)
+//         }
+//         res.status(200).json({allbills: recentactivity});
+          
+// }catch (error)
+// {
+//     res.writeHead(400, {'Content-Type': 'text/plain'})
+// }
+// });
+
+
+router.post("/recentactivity/", async (req, res) => {
+    try{
+       console.log("Inside Get  All Bills")
+        var useremail=req.body.useremail
+        const allgroupsadded= await User.find({"email":useremail},{groups_added:1,_id:0});
+        //console.log(allgroupsadded[0].groups_added)
+        let grouparray=[]
+        grouparray=allgroupsadded[0].groups_added
+        console.log(grouparray)
+        let recentactivity=[]
+        for(let i=0;i<grouparray.length;i++)
+        {
+            let currentgroup=grouparray[i]
+            console.log(currentgroup)
+            let allbillstats= await Bill.find({"groupname":currentgroup},{billcreatedby:1,billdescription:1,billamount:1,_id:0,billdate:1,groupname:1});
+            recentactivity.push(allbillstats)
+        }
+        let resultarray=[]
+        let allresponse=recentactivity
+        console.log("ALl Response:",allresponse)
+        for(let i=0;i<allresponse.length;i++)
+                            {
+                                let currentresponse=allresponse[i]
+                                console.log(allresponse[i])
+                                for(let j=0;j<currentresponse.length;j++)
+                                {
+                                resultarray.push(currentresponse[j])
+                                }
+                            }
+        res.status(200).json({allbills: resultarray});
+          
+}catch (error)
+{
+    res.writeHead(400, {'Content-Type': 'text/plain'})
+}
+});
+
+
+
 module.exports = router;

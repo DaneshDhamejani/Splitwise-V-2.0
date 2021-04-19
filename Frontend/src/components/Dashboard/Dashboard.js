@@ -102,22 +102,6 @@ class Dashboard extends Component {
 
         })
 
-        // await axios.post(`${backendServer}/transaction/amountowed`, data).then((response) => {
-        //     console.log("Got Amount Owed", response.data.amountowed)
-        //     // this.setState({totalowed: response.data.amountowed});
-        //     // console.log("Printing total owed",this.state.totalowed)
-
-        // })
-
-        // await axios.post(`${backendServer}/transaction/amountowe`, data).then((response) => {
-        //     console.log("Got Amount Owe", response.data.amountowe)
-        //     // this.setState({totalowe: response.data.amountowe});
-        //     // console.log("Printing total owe",this.state.totalowe)
-        // })
-        // // let totalbalancedue=this.state.totalowed-this.state.totalowe
-        // // console.log(totalbalancedue)
-        // // this.setState({totalbalance: totalbalancedue});
-
 
 
           await axios.post(`${backendServer}/transaction/allstats`, data).then((response) => {

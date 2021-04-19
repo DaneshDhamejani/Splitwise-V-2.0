@@ -2,13 +2,12 @@ import React, { Component } from 'react'
 import axios from 'axios';
 import backendServer from "../../webConfig";
 
-var useremail = localStorage.getItem('user')
 
 export default class Activity extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            myemail:useremail,
+            useremail:localStorage.getItem('useremail'),
             username:"",
             allbillinfo:[],
             error:""
@@ -19,15 +18,17 @@ export default class Activity extends Component {
     componentDidMount(){
         console.log(this.state.myemail);
         var data = {
-            email: this.state.myemail
+            useremail: this.state.useremail
         }
        
-        axios.post(`${backendServer}/activity`,data)
+        axios.post(`${backendServer}/bills/recentactivity`,data)
                     .then((response) => {
                         if (response.status === 200) 
                         {
-                            console.log(response.data)
-                            this.setState({allbillinfo: response.data});
+                            console.log(response.data.allbills)
+                            let allresponse=response.data.allbills
+                            
+                            this.setState({allbillinfo: allresponse});
                             console.log(this.state.allbillinfo)
                         } 
                         else if (response.status === 400) 
@@ -47,7 +48,7 @@ export default class Activity extends Component {
         return (
             <div>
                 {this.state.allbillinfo.map((user) => (
-                <ul><li>You added a transaction named <b>{user.description}</b> in group <b>{user.group_name}</b> which amounts to <b>$</b><b>{user.total_amount}</b> on <b>{Date(user.bill_timestamp)}</b></li></ul>
+                <ul><li><b>{user.billcreatedby}</b> created a bill in <b>{user.groupname}</b> named <b>{user.billdescription}</b> of amount <b>$ {user.billamount}</b> on <b>{user.billdate}</b></li></ul>
                 ))}
             </div>
         )
