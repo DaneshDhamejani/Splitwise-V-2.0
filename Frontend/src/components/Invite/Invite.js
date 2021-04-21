@@ -9,7 +9,7 @@ import {
     Card,
     Modal,
   } from "react-bootstrap";
-  import Nav from "react-bootstrap/Nav";
+
 
 
   var useremail = localStorage.getItem('user')

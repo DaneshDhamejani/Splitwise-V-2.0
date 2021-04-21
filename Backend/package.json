@@ -20,6 +20,7 @@
     "express-session": "^1.17.1",
     "is-empty": "^1.2.0",
     "jsonwebtoken": "^8.5.1",
+    "kafka-node": "^3.0.1",
     "mocha": "^8.3.2",
     "moment": "^2.29.1",
     "mongoose": "^5.12.2",

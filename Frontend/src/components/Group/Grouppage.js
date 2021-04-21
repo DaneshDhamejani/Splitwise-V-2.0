@@ -5,7 +5,17 @@ import Modal from "react-bootstrap/Modal";
 import { Button, Form, FormControl, ControlLabel } from "react-bootstrap";
 import backendServer from "../../webConfig";
 
+const customStyles = {
+    content: {
+        top: '40%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)'
 
+    }
+};
 
 class Grouppage extends Component {
     constructor(props){
@@ -54,6 +64,7 @@ class Grouppage extends Component {
             amount : e.target.value
         })
       }
+      
     
     
     handleBillSubmit = (e) => {
@@ -158,11 +169,6 @@ class Grouppage extends Component {
                         console.log("Checking whether users in groups are there or not", this.state.memberemails)
 
                     })
-
-
-
-
-
                     
                     
           
@@ -175,15 +181,16 @@ class Grouppage extends Component {
             <div>
                 <center><h3>{this.state.groupname}</h3></center>
                 <center><Button onClick={this.handleModalOpen}>Add an expense</Button></center>
+               
                 <div className="row">
-                <div className="col-md-3">
-                <b>Members of {this.state.groupname}:</b>
+                <div className="col-md-3 border-0">
+                <center><b>Members of {this.state.groupname}</b></center>
                 {this.state.membernames.map((user) => (
-                <ul><li>{user}</li></ul>
+                <div className="d-flex my-1 border 1px"><ul><li>{user}</li></ul></div>
                 
             ))}
             </div>
-            <div className="col-md-3">
+            <div className="col-md-6 border-0">
             <Modal show={this.state.show}>
                 <Modal.Header>Add a bill</Modal.Header>
                 <Modal.Body>
@@ -215,8 +222,16 @@ class Grouppage extends Component {
             </Modal.Footer>
                 
                 </Modal>
+                <br></br>
+                
+
+                <center><b>Bills</b></center>
+                
                 {this.state.allbillsinfo.map((user) => (
-                <ul><li><b>Description:</b>  {user.billdescription}<br></br><b>Amount:</b>  {user.billamount}</li></ul>
+                <div className="d-flex my-1 border 1px">
+                    <ul><li><b>Description:</b>  {user.billdescription}<br></br><b>Amount:</b>  {user.billamount}</li></ul>
+                    
+                    </div>
                 ))}
     
             </div>

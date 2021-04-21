@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const keys = require("../config/keys");
 const User = require("../models/User");
 const Group = require("../models/Group");
+const kafka= require("../kafka/client")
 
 router.post("/creategroup/", async (req, res) => {
     try{
@@ -95,19 +96,41 @@ router.post("/getallgroupsaccepted/", async (req, res) => {
 }
 });
 
-router.post("/allgroupsinvited/", async (req, res) => {
-    try{
-       console.log("Inside All groups user has been invited to")
-        var useremail=req.body.useremail
-        const allgroups= await User.find({email:useremail},{groups_invited:1});
+// router.post("/allgroupsinvited/", async (req, res) => {
+//     try{
+//        console.log("Inside All groups user has been invited to")
+//         var useremail=req.body.useremail
+//         const allgroups= await User.find({email:useremail},{groups_invited:1});
 
-        res.status(200).json({groups: allgroups});
+//         res.status(200).json({groups: allgroups});
           
-}catch (error)
-{
-    res.writeHead(400, {'Content-Type': 'text/plain'})
-}
+// }catch (error)
+// {
+//     res.writeHead(400, {'Content-Type': 'text/plain'})
+// }
+// });
+
+
+router.post("/allgroupsinvited/", async (req, res) => {
+    kafka.make_request("getGroups", req.body, function (err, result) {
+        console.log("in result");
+        // console.log("results in my getgroups ", res
+        // );
+        if (err) {
+          console.log("Inside err");
+          res.json({
+            status: "error",
+            msg: "Could not fetch groups, Try Again.",
+          });
+        } else {
+            // console.log(res)
+            res.status(200).json({groups: result});
+        }
+      });
 });
+
+
+
 
 router.post("/getgroupmembers/", async (req, res) => {
     try{
