@@ -30,14 +30,13 @@ export default class Activity extends Component {
             perPage: 2,
             currentPage: 0,
             sliceddata: [],
-            sortedListAsc:[],
-            sortedListDesc:[]
+            allgroups: []
 
         }
         this.handlePageClick = this.handlePageClick.bind(this)
         this.handleChange = this.handleChange.bind(this)
         this.handleAscending = this.handleAscending.bind(this)
-        this.handleDescending=this.handleDescending.bind(this)
+        this.handleDescending = this.handleDescending.bind(this)
     }
     handlePageClick = (e) => {
         const selectedPage = e.selected;
@@ -52,27 +51,46 @@ export default class Activity extends Component {
 
     };
 
-    handleAscending= (e) => {
-        
+    handleAscending = (e) => {
+
         console.log(this.state.allbillinfo)
-        let n = this.state.allbillsinfo.length;
-        let currentelement=this.state.allbillinfo
-        for (let i = 0; i < n-1; i++)
-            for (let j = 0; j < n-i-1; j++)
-                if (currentelement[j].billdate > currentelement[j+1])
-                {
-                    // swap arr[j+1] and arr[j]
-                    let temp = currentelement[j];
-                    currentelement[j] = currentelement[j+1];
-                    currentelement[j+1] = temp;
-                }
+        let n = this.state.allbillinfo.length;
+        let currentlist = this.state.allbillinfo
+        currentlist.sort((a, b) => (a.billdate > b.billdate) ? 1 : -1)
+
+        console.log(currentlist)
+        const slice = currentlist.slice(this.state.offset, this.state.offset + this.state.perPage)
+        console.log(this.state.perPage)
+        console.log("Slice", slice)
+        this.setState({sliceddata: slice})
+
+
+        this.setState({
+            pageCount: Math.ceil(this.state.allbillinfo.length / this.state.perPage)
+
+        })
+
 
     }
-    handleDescending= (e) => {
-        
-        console.log(this.state.allbillinfo)
-    }
+    handleDescending = (e) => {
 
+        console.log(this.state.allbillinfo)
+        let n = this.state.allbillinfo.length;
+        let currentlist = this.state.allbillinfo
+        currentlist.sort((a, b) => (b.billdate > a.billdate) ? 1 : -1)
+
+        console.log(currentlist)
+        const slice = currentlist.slice(this.state.offset, this.state.offset + this.state.perPage)
+        console.log(this.state.perPage)
+        console.log("Slice", slice)
+        this.setState({sliceddata: slice})
+
+
+        this.setState({
+            pageCount: Math.ceil(this.state.allbillinfo.length / this.state.perPage)
+
+        })
+    }
 
 
     handleChange = async (e, data) => {
@@ -93,6 +111,21 @@ export default class Activity extends Component {
         })
     }
 
+    handleSearch = async (e, data) => {
+    let itemtofilter=e.target.value
+    const slice = this.state.allbillinfo.slice(this.state.offset, this.state.offset + this.state.perPage)
+        let filtered_text=slice.filter(todo => todo.groupname === itemtofilter)
+        
+        console.log("Filtered text",filtered_text)
+        this.setState({sliceddata: filtered_text})
+        this.setState({
+            pageCount: Math.ceil(this.state.allbillinfo.length / this.state.perPage)
+
+        })
+      
+        
+    }
+
 
     receivedData() {
 
@@ -108,29 +141,10 @@ export default class Activity extends Component {
         })
 
     }
-    
-    // sortAscending() {
 
-    //     console.log(this.state.allbillsinfo)
-    //     // let n = this.state.allbillsinfo.length;
-    //     // let currentelement=this.state.
-    //     // for (let i = 0; i < n-1; i++)
-    //     //     for (let j = 0; j < n-i-1; j++)
-    //     //         if (currentelement[j].billdate > currentelement[j+1])
-    //     //         {
-    //     //             // swap arr[j+1] and arr[j]
-    //     //             int temp = arr[j];
-    //     //             arr[j] = arr[j+1];
-    //     //             arr[j+1] = temp;
-    //     //         }
-
-        
-
-    // }
 
     async componentDidMount() {
 
-        
 
         console.log(this.state.myemail);
         var data = {
@@ -144,6 +158,16 @@ export default class Activity extends Component {
 
                 this.setState({allbillinfo: allresponse});
                 console.log(this.state.allbillinfo)
+                let currentgroups = []
+                for (let i = 0; i < this.state.allbillinfo.length; i++) {
+                    let currentobject = this.state.allbillinfo[i]
+                    if (! currentgroups.includes(currentobject.groupname)) {
+                        currentgroups.push(currentobject.groupname)
+                    }
+                }
+                console.log(currentgroups)
+                this.setState({allgroups: currentgroups});
+                console.log("All groups",this.state.allgroups)
             } else if (response.status === 400) {
                 this.setState({error: response.data});
 
@@ -164,42 +188,81 @@ export default class Activity extends Component {
                         <h2>Recent Activities</h2>
                     </div>
                     <div className="d-flex justify-content-center">
-                    <ReactPaginate
-                    previousLabel={"prev"}
-                    nextLabel={"next"}
-                    breakLabel={"..."}
-                    breakClassName={"break-me"}
-                    pageCount={this.state.pageCount}
-                    marginPagesDisplayed={2}
-                    pageRangeDisplayed={5}
-                    onPageChange={this.handlePageClick}
-                    containerClassName={"pagination"}
-                    subContainerClassName={"pages pagination"}
-                    activeClassName={"active"}/>
-                    </div>
-                    <div className="d-flex my-3  justify-content-center">
-                    <select value="1"
-                     value={this.state.selectValue} 
-                     onChange={this.handleChange} 
-             >
-                <option defaultValue>Select number of entries to be displayed</option>
-  <option value="2">2</option>
-  <option value="5">5</option>
-  <option value="10">10</option>
-</select>
+                        <ReactPaginate previousLabel={"prev"}
+                            nextLabel={"next"}
+                            breakLabel={"..."}
+                            breakClassName={"break-me"}
+                            pageCount={
+                                this.state.pageCount
+                            }
+                            marginPagesDisplayed={2}
+                            pageRangeDisplayed={5}
+                            onPageChange={
+                                this.handlePageClick
+                            }
+                            containerClassName={"pagination"}
+                            subContainerClassName={"pages pagination"}
+                            activeClassName={"active"}/>
                     </div>
                     <div className="d-flex my-3 justify-content-center">
-                        <Button onClick={this.handleAscending}>Sort Ascending</Button>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <Button onClick={this.handleDescending}>Sort Descending</Button>
+                        <select value="1"
+                            value={
+                                this.state.selectValue
+                            }
+                            onChange={
+                                this.handleChange
+                        }>
+                            <option defaultValue>Select number of activities to be displayed
+                            </option>
+                            <option value="2">2</option>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                        </select>
                     </div>
-                    {this.state.sliceddata.map((user) => (
-                <div className="d-flex my-3 justify-content-center border 1px">      
-                <b>{user.billcreatedby}</b>&nbsp;created a bill in&nbsp;<b>&nbsp;{user.groupname}&nbsp;</b> named<b>&nbsp;{user.billdescription}</b>&nbsp;of amount &nbsp;<b>${user.billamount}&nbsp;</b> on &nbsp;<b>{user.billdate}</b>
-                </div>))}
-                </div>
+                     <div className="d-flex my-3  justify-content-center">
+                        <select value="1"
+                            value={
+                                this.state.selectValue
+                            }
+                            onChange={
+                                this.handleSearch
+                        }>
+                            <option defaultValue>Select group to filter activities</option>
+                            {this.state.allgroups.map((user) => (
+                            <option value={user}>{user}
+                </option>
+              ))}
+                        </select>
+                    </div>
+                    <div className="d-flex my-3 justify-content-center">
+                        <Button onClick={
+                            this.handleAscending
+                        }>Sort Ascending</Button>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <Button onClick={
+                            this.handleDescending
+                        }>Sort Descending</Button>
+                    </div>
+                    {
+                    this.state.sliceddata.map((user) => (
+                        <div className="d-flex my-3 justify-content-center border 1px">
+                            <b>{
+                                user.billcreatedby
+                            }</b>&nbsp;created a bill in&nbsp;<b>&nbsp;{
+                                user.groupname
+                            }&nbsp;</b>
+                            named<b>&nbsp;{
+                                user.billdescription
+                            }</b>&nbsp;of amount &nbsp;<b>${
+                                user.billamount
+                            }&nbsp;</b>
+                            on &nbsp;<b>{
+                                user.billdate
+                            }</b>
+                        </div>
+                    ))
+                } </div>
             </div>
         )
     }
 }
-
