@@ -100,6 +100,16 @@ class Grouppage extends Component {
                     this.setState({
                         billadded : true,
                     })
+                    axios.post(`${backendServer}/bills/getallbills`,data)
+                    .then(response => {
+                        console.log("Got response for get all bills")
+                        console.log(response.data.allbillsinfo)
+                        this.setState({
+                            allbillsinfo:response.data.allbillsinfo,
+                            show : false
+                    }) 
+                    });
+            console.log("Bills info is here",this.state.allbillsinfo)
                 }else if(response.status === 202){
                     this.setState({
                         billadded : false,

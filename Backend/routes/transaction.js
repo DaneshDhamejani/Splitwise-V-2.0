@@ -120,12 +120,42 @@ router.post("/allstats/", async (req, res) => {
 
          // Overall stats
         let userbalancearray=[]
+        if(owed.length==0 && owe.length>0)
+        {
+            console.log("Inside only owe")
+            console.log("owe.length",owe.length)
+            console.log("owed.length",owed.length)
+            for(let i=0;i<owe.length;i++)
+            {
+
+                console.log("Inside for")
+                userbalancearray.push({"user":owe[i]._id,"balance":-Math.abs(owe[i].splitamount)})
+            }
+            console.log("Printing userbalancearray inside owe",userbalancearray)
+        }
+        else if(owe.length==0 && owed.length>0)
+        {
+            console.log("Inside only owed")
+            console.log("owed.length",owed.length)
+            console.log("owe.length",owe.length)
+            for(let i=0;i<owed.length;i++)
+            {
+
+                console.log("Inside for")
+                userbalancearray.push({"user":owed[i]._id,"balance":Math.abs(owed[i].splitamount)})
+            }
+            console.log("Printing userbalancearray inside owed",userbalancearray)
+        }
+        else{
         for(let i=0;i<owed.length;i++)
         {
             var currentowed=owed[i]
+            console.log("Current owed",currentowed)
             for(let j=0;j<owe.length;j++)
             {
+                console.log("Inside inner")
                 var currentowe=owe[j]
+                console.log("Current owe",currentowe)
                 if(currentowed._id==currentowe._id)
                 {
                     var totalbalance=currentowed.splitamount-currentowe.splitamount
@@ -134,7 +164,8 @@ router.post("/allstats/", async (req, res) => {
                
             }
         }
-        console.log(userbalancearray)
+    }
+        console.log("Printing user balance array",userbalancearray)
         // allstatsarray=owearray.concat(owedarray)
 
         res.status(200).json({"Alluserstats":userbalancearray});
