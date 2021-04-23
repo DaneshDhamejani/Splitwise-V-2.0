@@ -11,6 +11,8 @@ var connection =  new require('./kafka/Connection');
 // var Allmsgs = require('./services/Allmsgs.js');
 // var Gettmsgs = require('./services/Gettmsgs.js');
  var getGroups = require('./services/Getgroups.js');
+ var AddBill = require('./services/AddBill.js');
+ var AddComment = require('./services/AddComment.js');
 
 function handleTopicRequest(topic_name,fname){
     //var topic_name = 'root_topic';
@@ -58,3 +60,5 @@ function handleTopicRequest(topic_name,fname){
 // handleTopicRequest("allmsgs",Allmsgs)
 // handleTopicRequest("gettmsgs",Gettmsgs)
 handleTopicRequest("getGroups",getGroups)
+handleTopicRequest("AddComment",AddComment)
+handleTopicRequest("AddBill",AddBill)

@@ -8,67 +8,89 @@ const Group = require("../models/Group");
 const Bill = require("../models/Bills");
 const Transaction = require("../models/Transaction");
 var mongoose = require('mongoose');
+const kafka= require("../kafka/client")
+
+
+// router.post("/addbill/", async (req, res) => {
+//     try{
+//         // email we will get from localstorage
+//         var useremail=req.body.useremail
+//         var groupname=req.body.groupname
+//         var billdescription= req.body.billdescription
+//         var billamount=req.body.billamount
+//         var numberofmembers = req.body.numberofmembers
+//         var memberemails = req.body.memberemails
+
+
+//         const bill=new Bill()
+//         bill.billcreatedby=useremail
+//         bill.groupname=groupname
+//         bill.billdescription=billdescription
+//         bill.billamount=billamount
+//         await bill.save()
+        
+//         var splitamount=billamount/numberofmembers
+//         splitamount=splitamount.toFixed(2)
+//         console.log(splitamount)
+//         let sender=useremail
+//         let receiverarray=[]
+
+//         for(let i=0;i<memberemails.length;i++)
+//         {
+//             if(memberemails[i]!=useremail)
+//             {
+//                 receiverarray.push(memberemails[i])
+//             }
+//         }
+//         console.log(receiverarray)
+//         for(let i=0;i<receiverarray.length;i++)
+//         {
+            
+//             let transaction= new Transaction();
+            
+//             transaction.receiver=receiverarray[i]
+            
+//             transaction.sender=useremail
+//             transaction.splitamount=splitamount
+            
+//             let trans=await transaction.save()
+            
+//             if(trans)
+//             console.log(trans)
+//         }
+       
+//         res.status(200).json({message: "Added Bill & Updated Transaction Successfully!"});
+
+        
+       
+       
+
+// }catch (error)
+// {
+//     res.writeHead(400, {'Content-Type': 'text/plain'})
+// }
+// });
+
 
 
 router.post("/addbill/", async (req, res) => {
-    try{
-        // email we will get from localstorage
-        var useremail=req.body.useremail
-        var groupname=req.body.groupname
-        var billdescription= req.body.billdescription
-        var billamount=req.body.billamount
-        var numberofmembers = req.body.numberofmembers
-        var memberemails = req.body.memberemails
-
-
-        const bill=new Bill()
-        bill.billcreatedby=useremail
-        bill.groupname=groupname
-        bill.billdescription=billdescription
-        bill.billamount=billamount
-        await bill.save()
-        
-        var splitamount=billamount/numberofmembers
-        splitamount=splitamount.toFixed(2)
-        console.log(splitamount)
-        let sender=useremail
-        let receiverarray=[]
-
-        for(let i=0;i<memberemails.length;i++)
-        {
-            if(memberemails[i]!=useremail)
-            {
-                receiverarray.push(memberemails[i])
-            }
+    kafka.make_request("AddBill", req.body, function (err, result) {
+        console.log("in result");
+        // console.log("results in my getgroups ", res
+        // );
+        if (err) {
+          console.log("Inside err");
+          res.json({
+            status: "error",
+            msg: "Could not fetch groups, Try Again.",
+          });
+        } else {
+            // console.log(res)
+            res.status(200).json(result);
         }
-        console.log(receiverarray)
-        for(let i=0;i<receiverarray.length;i++)
-        {
-            
-            let transaction= new Transaction();
-            
-            transaction.receiver=receiverarray[i]
-            
-            transaction.sender=useremail
-            transaction.splitamount=splitamount
-            
-            let trans=await transaction.save()
-            
-            if(trans)
-            console.log(trans)
-        }
-       
-        res.status(200).json({message: "Added Bill & Updated Transaction Successfully!"});
-
-        
-       
-       
-
-}catch (error)
-{
-    res.writeHead(400, {'Content-Type': 'text/plain'})
-}
+      });
 });
+
 
 router.post("/getallbills/", async (req, res) => {
     try{
@@ -150,35 +172,57 @@ router.post("/recentactivity/",async (req, res) => {
 });
 
 
-router.post("/addcomment/", async (req, res) => {
-    try{
-       console.log("Inside add comments")
-        var bill_id=req.body.bill_id
-        var commentcreatedby= req.body.useremail
-        var commentmessage= req.body.comment
+// router.post("/addcomment/", async (req, res) => {
+//     try{
+//        console.log("Inside add comments")
+//         var bill_id=req.body.bill_id
+//         var commentcreatedby= req.body.useremail
+//         var commentmessage= req.body.comment
         
 
         
-        console.log("Here")
-        const id = mongoose.Types.ObjectId();
-        console.log("Here1")
-        await Bill.updateOne({_id:bill_id},{
-            $push:{
-                billcomments:
-                {
-                comment_id:id,
-                comment_createdby:commentcreatedby,
-                comment_message:commentmessage
-                }
-            }
-        })
-    res.status(200).json({message: "Comment added successfully"});
+//         console.log("Here")
+//         const id = mongoose.Types.ObjectId();
+//         console.log("Here1")
+//         await Bill.updateOne({_id:bill_id},{
+//             $push:{
+//                 billcomments:
+//                 {
+//                 comment_id:id,
+//                 comment_createdby:commentcreatedby,
+//                 comment_message:commentmessage
+//                 }
+//             }
+//         })
+//     res.status(200).json({message: "Comment added successfully"});
           
-}catch (error)
-{
-    res.writeHead(400, {'Content-Type': 'text/plain'})
-}
+// }catch (error)
+// {
+//     res.writeHead(400, {'Content-Type': 'text/plain'})
+// }
+// });
+
+
+router.post("/addcomment/", async (req, res) => {
+    kafka.make_request("AddComment", req.body, function (err, result) {
+        console.log("in result");
+        // console.log("results in my getgroups ", res
+        // );
+        if (err) {
+          console.log("Inside err");
+          res.json({
+            status: "error",
+            msg: "Could not fetch groups, Try Again.",
+          });
+        } else {
+            // console.log(res)
+            res.status(200).json(result);
+        }
+      });
 });
+
+
+
 
 
 
