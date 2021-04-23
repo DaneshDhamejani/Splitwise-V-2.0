@@ -25,15 +25,15 @@ router.post("/imageupload", upload.single("file"), async function (req, res) {
   // resize
 
   const result = await uploadFile(file);
-  
+ 
   await unlinkFile(file.path);
   console.log("Hello")
   console.log(result);
   console.log(result.Location)
-  
+ 
   await User.updateOne({"email":useremail},{$set:{"profileImg":result.Location}})
-  
-  
+ 
+ 
   console.log("I am here")
    res.status(200).json({message: "Picture uploaded successfully"});
   }
@@ -41,7 +41,7 @@ catch (error)
 {
      res.writeHead(400, {'Content-Type': 'text/plain'})
 }
-  
+ 
 });
 
 
@@ -73,9 +73,8 @@ router.post("/getimageonload", async function (req, res) {
     res.writeHead(400, {'Content-Type': 'text/plain'})
 }
 });
-  
+ 
 
-  
-  
+ 
+ 
   module.exports = router;
-

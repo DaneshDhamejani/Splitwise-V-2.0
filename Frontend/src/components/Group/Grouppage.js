@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import axios from 'axios';
 import Modal from "react-bootstrap/Modal";
 import { Button, Form, FormControl, ControlLabel } from "react-bootstrap";
 import backendServer from "../../webConfig";
+import { Accordion, Card } from "react-bootstrap";
+import "../Group/Grouppage.css";
 
 const customStyles = {
     content: {
@@ -31,8 +33,12 @@ class Grouppage extends Component {
             allbillsinfo:[],
             useremail:localStorage.getItem("useremail"),
             memberemails:[],
-            moneypendingtopay:0,
-            moneytoget:0
+            leavegroup:0,
+            allbillids:[],
+            comment:"",
+            delete_comment:"",
+            comment_deleted:0
+            
 
         }
         this.handleModalOpen = this.handleModalOpen.bind(this);
@@ -40,6 +46,8 @@ class Grouppage extends Component {
         this.handleDescription = this.handleDescription.bind(this);
         this.handleAmount = this.handleAmount.bind(this);
         this.handleBillSubmit = this.handleBillSubmit.bind(this);
+        this.handleLeaveGroup = this.handleLeaveGroup.bind(this);
+        this.handleSubmit=this.handleSubmit.bind(this);
         
 
     }
@@ -64,6 +72,92 @@ class Grouppage extends Component {
             amount : e.target.value
         })
       }
+      handleCommentChange = (e) => {
+          console.log("Printing comment",e.target.value)
+        this.setState({comment: e.target.value})
+    }
+
+    handleSubmit = (e,data) =>
+    {
+        
+    
+        var data_for_comment={
+            useremail:this.state.useremail,
+            bill_id:data,
+            comment:this.state.comment
+        }
+        console.log("Before API")
+         axios.post(`${backendServer}/bills/addcomment`,data_for_comment)
+            .then(response => {
+                
+                if(response.status === 200){
+                    axios.post(`${backendServer}/bills/getallbills`,data)
+                    .then(response => {
+                        console.log("Got response for get all bills")
+                        console.log(response.data.allbillsinfo)
+                        this.setState({
+                            allbillsinfo:response.data.allbillsinfo,
+                            
+                    }) 
+                    });
+                    console.log("Comment added successfully")
+                }
+               
+                
+            });
+
+    }
+    
+    handleLeaveGroup = (e) => {
+          alert("Are you sure you want to leave th group?")
+          var data = {
+            useremail:this.state.useremail,
+            groupname:this.state.groupname
+            }
+            axios.post(`${backendServer}/groups/leavegroup`,data)
+            .then(response => {
+                console.log("Got response leave group")
+                
+                this.setState({
+                    leavegroup : 1
+        })
+        
+      })
+      
+    }
+
+    handleCommentDelete = (e,cid,bid) => {
+        console.log("Got commend iD",cid)
+        console.log("Got Bill ID",bid)
+        var dataforcomments=
+        {
+            bid:bid,
+            cid:cid
+        }
+        var data = {
+            
+            groupname:this.state.groupname,
+            
+            }
+        axios.post(`${backendServer}/bills/deletecomment`,dataforcomments)
+            .then(response => {
+                console.log("Inside Delete Comment frontend")
+                
+                if(response.status === 200){
+                    
+                    axios.post(`${backendServer}/bills/getallbills`,data)
+                    .then(response => {
+                        console.log("Got response for get all bills")
+                        console.log(response.data.allbillsinfo)
+                        this.setState({
+                            allbillsinfo:response.data.allbillsinfo,
+                            comment_delete : 1
+                        })
+                    });
+        
+        }
+    })
+}
       
     
     
@@ -137,7 +231,7 @@ class Grouppage extends Component {
       
     
     
-        componentDidMount() {
+        async componentDidMount() {
             var data = {
                 expensedescription: this.state.expensedescription,
                 amount: this.state.amount,
@@ -150,7 +244,7 @@ class Grouppage extends Component {
 
         console.log("Got group name!",this.state.groupname)
          console.log(this.props.history.location.pathname.substring(8)) //Getting the exact apartment number
-         axios.post(`${backendServer}/groups/getgroupmembers`,dataforgroups)
+         await axios.post(`${backendServer}/groups/getgroupmembers`,dataforgroups)
                     .then((response) => {
                         console.log("Inside app.get of frontend")
                         console.log("Got group members:",response.data.groupmembers)
@@ -159,7 +253,7 @@ class Grouppage extends Component {
 
                     })
 
-                    axios.post(`${backendServer}/bills/getallbills`,data)
+                    await axios.post(`${backendServer}/bills/getallbills`,data)
                     .then(response => {
                         console.log("Got response for get all bills")
                         console.log(response.data.allbillsinfo)
@@ -171,7 +265,7 @@ class Grouppage extends Component {
             console.log("Bills info is here",this.state.allbillsinfo)
                     
 
-                    axios.post(`${backendServer}/groups/fetchemails`,data)
+                    await axios.post(`${backendServer}/groups/fetchemails`,data)
                     .then((response) => {
                         console.log("Getting user emails at frontend")
                         console.log(response.data.groupmemberemails)
@@ -179,6 +273,28 @@ class Grouppage extends Component {
                         console.log("Checking whether users in groups are there or not", this.state.memberemails)
 
                     })
+                console.log("Got all bills info state",this.state.allbillsinfo)
+                
+                let allcomments=[]
+                
+                for(let i=0;i<this.state.allbillsinfo.length;i++)
+                {
+                    allcomments.push(this.state.allbillsinfo[i].billcomments)
+                }
+                console.log("Printing all comments",allcomments)
+
+                this.setState({
+                    allcomments : allcomments
+                })
+                console.log("Printing all comments2",this.state.allcomments)
+               
+                
+                // await axios.post(`${backendServer}/bills/getcomments`,dataforbills)
+                //     .then((response) => {
+                //         console.log("Getting user emails at frontend")
+                //         console.log("Got response for comments",response.data.allcomments)
+
+                //     })
                     
                     
           
@@ -189,9 +305,17 @@ class Grouppage extends Component {
         
         return (
             <div>
-                <center><h3>{this.state.groupname}</h3></center>
-                <center><Button onClick={this.handleModalOpen}>Add an expense</Button></center>
-               
+                {/* <center><h3>{this.state.groupname}</h3></center>
+                <center><Button onClick={this.handleModalOpen}>Add an expense</Button></center> */}
+                <div className="d-flex my-2 justify-content-center">
+                        <h2>{this.state.groupname}</h2>
+                    </div>
+                <div className="d-flex my-3 justify-content-center">
+                        <Button onClick={this.handleModalOpen}>Add an Expense</Button>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {/* <Button onClick={this.handleLeaveGroup}>Leave Group</Button> */}
+                        <Link to="/dashboard" onClick={this.handleLeaveGroup} className="btn btn-primary">Leave Group</Link>
+                </div>
                 <div className="row">
                 <div className="col-md-3 border-0">
                 <center><b>Members of {this.state.groupname}</b></center>
@@ -238,15 +362,42 @@ class Grouppage extends Component {
                 <center><b>Bills</b></center>
                 
                 {this.state.allbillsinfo.map((user) => (
+                <div class="thuscontainer">
                 <div className="d-flex my-1 border 1px">
                     <ul><li><b>Description:</b>  {user.billdescription}<br></br><b>Amount:</b>  {user.billamount}</li></ul>
-                    
+                    </div>
+                <div className="d-flex flex-column-reverse border 1px">
+
+                {user.billcomments.map((comment) => 
+                (
+                   
+                    <div className="d-flex my-1 border 1px">
+                        <b>{comment.comment_createdby}</b>: &nbsp; {comment.comment_message}
+                
+                        <div><button type="button" className="delButton btn-danger" onClick={(e) => { this.handleCommentDelete(e, comment.comment_id,user._id) }}>Delete Comment</button></div>
                     </div>
                 ))}
+                
+                <form>
+                    <input type="text" onChange={
+                                        this.handleCommentChange
+                                    }></input>
+                    
+                    <br></br>
+                    <button type="submit" className="btn-success" onClick={(e) => { this.handleSubmit(e, user._id) }}>Add Comment</button>
+                </form>
+                {/* <ul><li><b>Commented By:</b>  {user.billcomments.comment_createdby}<br></br><b>Amount:</b>  {user.billamount}</li></ul> */}
+                </div>
+                </div>
+                ))}
+
+
+               
+                
     
             </div>
             </div>
-            </div>
+             </div>
            
             
         )

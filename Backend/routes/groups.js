@@ -169,6 +169,21 @@ router.post("/fetchemails/", async (req, res) => {
 }
 });
 
+router.post("/leavegroup/", async (req, res) => {
+    try{
+       console.log("Inside leave groups")
+        var useremail=req.body.useremail
+        var groupname=req.body.groupname
+        await Group.updateOne({"groupname":groupname},{$pull:{"groupmembersacceptinvite":useremail}})
+        await User.updateOne({"email":useremail},{$pull:{"groups_added":groupname}})
+        
+        res.status(200).json({message:"User removed successfully"});
+          
+}catch (error)
+{
+    res.writeHead(400, {'Content-Type': 'text/plain'})
+}
+});
 
 
 

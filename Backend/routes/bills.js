@@ -7,6 +7,7 @@ const User = require("../models/User");
 const Group = require("../models/Group");
 const Bill = require("../models/Bills");
 const Transaction = require("../models/Transaction");
+var mongoose = require('mongoose');
 
 
 router.post("/addbill/", async (req, res) => {
@@ -73,7 +74,7 @@ router.post("/getallbills/", async (req, res) => {
     try{
        console.log("Inside Get  All Bills")
         var groupname=req.body.groupname
-        const allbillsinfo= await Bill.find({"groupname":groupname},{billamount:1,billdescription:1,_id:0});
+        const allbillsinfo= await Bill.find({"groupname":groupname},{billamount:1,billdescription:1,_id:1,billcomments:1});
         res.status(200).json({allbillsinfo: allbillsinfo});
           
 }catch (error)
@@ -111,7 +112,7 @@ router.post("/getallbills/", async (req, res) => {
 // });
 
 
-router.post("/recentactivity/", async (req, res) => {
+router.post("/recentactivity/",async (req, res) => {
     try{
        console.log("Inside Get  All Bills")
         var useremail=req.body.useremail
@@ -147,6 +148,81 @@ router.post("/recentactivity/", async (req, res) => {
     res.writeHead(400, {'Content-Type': 'text/plain'})
 }
 });
+
+
+router.post("/addcomment/", async (req, res) => {
+    try{
+       console.log("Inside add comments")
+        var bill_id=req.body.bill_id
+        var commentcreatedby= req.body.useremail
+        var commentmessage= req.body.comment
+        
+
+        
+        console.log("Here")
+        const id = mongoose.Types.ObjectId();
+        console.log("Here1")
+        await Bill.updateOne({_id:bill_id},{
+            $push:{
+                billcomments:
+                {
+                comment_id:id,
+                comment_createdby:commentcreatedby,
+                comment_message:commentmessage
+                }
+            }
+        })
+    res.status(200).json({message: "Comment added successfully"});
+          
+}catch (error)
+{
+    res.writeHead(400, {'Content-Type': 'text/plain'})
+}
+});
+
+
+
+router.post("/deletecomment/", async (req, res) => {
+    try{
+       console.log("Inside delete comments")
+        var cid=req.body.cid
+        var bid=req.body.bid
+        
+        console.log("Here1")
+        await Bill.updateOne({_id:mongoose.Types.ObjectId(bid)},{
+            $pull:{"billcomments":{comment_id:mongoose.Types.ObjectId(cid)}}
+        }
+            )
+        // console.log("Got item",item)
+    res.status(200).json({message: "COmment Deleted!"});
+          
+}catch (error)
+{
+    res.writeHead(400, {'Content-Type': 'text/plain'})
+}
+});
+
+
+
+// router.post("/getcomments/", async (req, res) => {
+//     try{
+//        console.log("Inside Get  All Bill Comments")
+//         var bill_id=req.body.bill_id
+//         console.log("Got Bill IDS as request",bill_id)
+//         var allcomments=[]
+//         for(let i=0;i<bill_id.length;i++)
+//         {
+//         var current_comment=await Bill.find({"_id":bill_id[i]},{billcomments:1,_id:0});
+//         allcomments.push(current_comment)
+//         }
+//         res.status(200).json({allcomments: allcomments});
+          
+// }catch (error)
+// {
+//     res.writeHead(400, {'Content-Type': 'text/plain'})
+// }
+// });
+
 
 
 

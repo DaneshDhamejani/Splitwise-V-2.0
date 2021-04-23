@@ -19,5 +19,9 @@ billdescription: {
 groupname: {
     type: String
   },
+billcomments: {
+    type: Array,
+    default: []
+  },
 });
 module.exports = User = mongoose.model("bills", BillSchema);
