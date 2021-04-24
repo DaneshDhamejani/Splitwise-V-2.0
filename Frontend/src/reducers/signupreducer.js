@@ -1,5 +1,5 @@
 import { SIGNUP_SUCCESS } from '../actions/actions';
-import { reducer as formReducer } from "redux-form";
+
 
 
 const initialState = {

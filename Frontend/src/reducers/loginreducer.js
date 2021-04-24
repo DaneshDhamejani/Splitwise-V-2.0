@@ -1,6 +1,6 @@
 import {LOGIN_ERROR } from '../actions/actions';
 import {LOGIN_SUCCESS} from '../actions/actions';
-import { reducer as formReducer } from "redux-form";
+
 
 const initialState = {
     logindetails: "",
