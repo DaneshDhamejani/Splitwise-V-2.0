@@ -111,7 +111,7 @@ class Signup extends Component {
                                     }/>
                             </div>
                             <div className="form-group inputLogin">
-                                <label for="exampleInputEmail1">Here's my
+                                <label for="exampleInputEmail1">Here's my&nbsp;
                                     <b>email address:</b>
                                 </label>
                                 <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email"
@@ -121,7 +121,7 @@ class Signup extends Component {
                             </div>
                             <div className="form-group inputLogin">
                                 <label for="exampleInputPassword1">
-                                    And here's my
+                                    And here's my&nbsp;
                                     <b>password:</b>
                                 </label>
                                 <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Password"

@@ -218,7 +218,7 @@ class Dashboard extends Component {
                     </div><br></br>
                     <div>
                     {this.state.totalowe.map((abc) => (
-            <ul><li>You owe <b>{abc.user}</b> <b>$</b>{Math.abs(abc.amount)}</li></ul>
+            <ul><li>You owe <b>{abc.user}</b> <b>$</b>{(Math.abs(abc.amount))}</li></ul>
             ))}
                     </div>
                 </div>
