@@ -6,14 +6,14 @@ const expect = require("chai").expect;
 const agent = require("chai").request.agent(index);
 
 
-describe("Splitwise", function () {
-  describe("Login Test", function () {
+describe("Splitwise-V-2.0", function () {
+  describe("Get all users except self", function () {
     it("Incorrect Password", () => {
       agent
-        .post("/ologin")
-        .send({ email: "danesh2497@sjsu.com", password: "12345" })
+        .post("users/allusersexceptself")
+        .send({useremail: "manoj@sjsu.edu" })
         .then(function (res) {
-          expect(res.text).to.equal('{"message":"Invalid credentials!"}');
+          expect(res.text).to.equal('{"message":"Got all users except self!"}');
         })
         .catch((error) => {
           console.log(error);
@@ -25,10 +25,10 @@ describe("Splitwise", function () {
   describe("Get group details", function () {
     it("Groups", () => {
       agent
-        .post("/getallbills")
-        .send({groupname:"Apt 207"})
+        .post("groups/getallgroupsaccepted")
+        .send({useremail:"manoj@sjsu.edu"})
         .then(function (res) {
-          expect(res.text).to.equal('{"Got all groups"}');
+          expect(res.text).to.equal('{"Got all groups accepted"}');
         })
         .catch((error) => {
           console.log(error);
@@ -37,11 +37,11 @@ describe("Splitwise", function () {
   }
 )
 
-describe("Get name for profile page", function () {
+describe("Get name for dashboard", function () {
   it("Profile", () => {
     agent
-      .post("/profile")
-      .send({useremail:"danesh2497@sjsu.com"})
+      .post("/users/getnamefordashboard")
+      .send({useremail:"manoj@sjsu.edu"})
       .then(function (res) {
         expect(res.text).to.equal('{"Got all my details of profile"}');
       })
@@ -52,13 +52,13 @@ describe("Get name for profile page", function () {
 }
 )
 
-describe("Get name to display on dashboard", function () {
+describe("Get Recent Activity", function () {
   it("Name for Dashboard", () => {
     agent
-      .post("/getnamefordashboard")
-      .send({useremail:"sai@gmail.com"})
+      .post("/bills/recentactivity")
+      .send({useremail:"manoj@sjsu.edu"})
       .then(function (res) {
-        expect(res.text).to.equal('{"Got name for dashboard"}');
+        expect(res.text).to.equal('{"Got recent activity"}');
       })
       .catch((error) => {
         console.log(error);
@@ -67,13 +67,13 @@ describe("Get name to display on dashboard", function () {
 }
 )
 
-describe("Get name to display on dashboard", function () {
-  it("Name for Dashboard", () => {
+describe("Get user all stats", function () {
+  it("All stats", () => {
     agent
-      .post("/fetchemails")
-      .send({groupname:"Apt 207"})
+      .post("/transaction/allstats")
+      .send({useremail:"manoj@sjsu.edu"})
       .then(function (res) {
-        expect(res.text).to.equal('{"Got all emails of members in the group"}');
+        expect(res.text).to.equal('{"Got all stats"}');
       })
       .catch((error) => {
         console.log(error);

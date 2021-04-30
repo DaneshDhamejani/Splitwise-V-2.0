@@ -120,16 +120,16 @@ class Dashboard extends Component {
              {
                  var stat=allstats[i]
                  console.log("Yo",allstats[i])
-                 if(stat.balance<0)
+                 if(stat.splitamount<0)
                  {
-                    owe.push({"user":stat.user,"amount":stat.balance})
-                    owetotal=owetotal+Math.abs(stat.balance)
+                    owe.push({"user":stat._id,"amount":stat.splitamount})
+                    owetotal=owetotal+Math.abs(stat.splitamount)
 
                  }
-                 else if(stat.balance>0)
+                 else if(stat.splitamount>0)
                  {
-                    owed.push({"user":stat.user,"amount":stat.balance})
-                    owedtotal=owedtotal+Math.abs(stat.balance)
+                    owed.push({"user":stat._id,"amount":stat.splitamount})
+                    owedtotal=owedtotal+Math.abs(stat.splitamount)
                  }
              }
              console.log("OWE:",owe)

@@ -114,61 +114,62 @@ router.post("/allstats/", async (req, res) => {
          
          ])
 
-         console.log("Owe:",owe)
+
+
+         let updatedowe=[]
+         for(let i=0;i<owe.length;i++)
+         {
+            updatedowe.push({"_id":owe[i]._id,"splitamount":owe[i].splitamount*-1})
+         }
+
+         console.log("Owe:",updatedowe)
          console.log("Owed:",owed)
 
+         let overall_array=[]
+         let only_owe=[]
+         let only_owed=[]
+         let temp_emails=[]
 
-         // Overall stats
-        let userbalancearray=[]
-        if(owed.length==0 && owe.length>0)
-        {
-            console.log("Inside only owe")
-            console.log("owe.length",owe.length)
-            console.log("owed.length",owed.length)
-            for(let i=0;i<owe.length;i++)
-            {
+      
 
-                console.log("Inside for")
-                userbalancearray.push({"user":owe[i]._id,"balance":-Math.abs(owe[i].splitamount)})
-            }
-            console.log("Printing userbalancearray inside owe",userbalancearray)
-        }
-        else if(owe.length==0 && owed.length>0)
-        {
-            console.log("Inside only owed")
-            console.log("owed.length",owed.length)
-            console.log("owe.length",owe.length)
-            for(let i=0;i<owed.length;i++)
-            {
 
-                console.log("Inside for")
-                userbalancearray.push({"user":owed[i]._id,"balance":Math.abs(owed[i].splitamount)})
-            }
-            console.log("Printing userbalancearray inside owed",userbalancearray)
-        }
-        else{
+         for(let i=0;i<updatedowe.length;i++)
+         {
+             let current_owe=updatedowe[i]
+             for(let j=0;j<owed.length;j++)
+             {
+                 let current_owed=owed[j]
+                 if(current_owe._id==current_owed._id)
+                 {
+                    overall_array.push({"_id":current_owe._id,"splitamount":current_owe.splitamount+current_owed.splitamount})
+                    temp_emails.push(current_owe._id)
+                 }
+             }
+         }
+         console.log("Overall array:",overall_array)
+         console.log("Temp emails:",temp_emails)
+         
+         
+         for(let i=0;i<updatedowe.length;i++)
+         {
+             if(!temp_emails.includes(updatedowe[i]._id))
+             {
+                overall_array.push(updatedowe[i])
+             }
+         }
+        console.log("Overall array updated1:",overall_array)
+
         for(let i=0;i<owed.length;i++)
-        {
-            var currentowed=owed[i]
-            console.log("Current owed",currentowed)
-            for(let j=0;j<owe.length;j++)
-            {
-                console.log("Inside inner")
-                var currentowe=owe[j]
-                console.log("Current owe",currentowe)
-                if(currentowed._id==currentowe._id)
-                {
-                    var totalbalance=currentowed.splitamount-currentowe.splitamount
-                    userbalancearray.push({"user":currentowed._id,"balance":totalbalance})
-                }
-               
-            }
-        }
-    }
-        console.log("Printing user balance array",userbalancearray)
-        // allstatsarray=owearray.concat(owedarray)
-
-        res.status(200).json({"Alluserstats":userbalancearray});
+         {
+             if(!temp_emails.includes(owed[i]._id))
+             {
+                overall_array.push(owed[i])
+             }
+         }
+         
+         console.log("Overall array updated2:",overall_array)
+         res.status(200).json({"Alluserstats":overall_array});
+              
           
 }catch (error)
 {

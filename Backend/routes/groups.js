@@ -7,7 +7,9 @@ const User = require("../models/User");
 const Group = require("../models/Group");
 const kafka= require("../kafka/client")
 
-router.post("/creategroup/", async (req, res) => {
+
+
+router.post("/creategroup/",async (req, res) => {
     try{
     console.log("Inside Create Group Post Request");
     const groupExists = await Group.findOne({ groupname: req.body.groupname });
